@@ -1,0 +1,2952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aureum — Private Client Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F0D0B;
+    --panel:#17140F;
+    --panel-2:#1D1912;
+    --line:#2E2818;
+    --line-soft:#231F16;
+    --ivory:#F3EEE3;
+    --ivory-dim:#A79E8C;
+    --ivory-faint:#6E6656;
+    --brass:#C6A15B;
+    --brass-bright:#E3C179;
+    --brass-dim:#8A733F;
+    --emerald:#4C8064;
+    --oxblood:#9C4A44;
+    --ink-rgb:15,13,11;
+    --radius:3px;
+  }
+
+  /* ---------- Theme variants ----------
+     Every colour in this file is drawn from the custom properties above,
+     so switching themes is just remapping this palette on <html data-theme="...">.
+     See the theme switcher in the topbar / Settings > Appearance. */
+  html[data-theme="ivory"]{
+    --ink:#F4F0E5;
+    --panel:#FFFFFF;
+    --panel-2:#EDE7D8;
+    --line:#DCD3BC;
+    --line-soft:#E7E0CE;
+    --ivory:#241F14;
+    --ivory-dim:#5B5340;
+    --ivory-faint:#8C8368;
+    --brass:#A9803F;
+    --brass-bright:#8A6A30;
+    --brass-dim:#C6A15B;
+    --emerald:#3D6E52;
+    --oxblood:#9C4A44;
+    --ink-rgb:255,255,255;
+  }
+  html[data-theme="sapphire"]{
+    --ink:#0A0F17;
+    --panel:#111926;
+    --panel-2:#16202F;
+    --line:#243349;
+    --line-soft:#1C2836;
+    --ivory:#E9EEF5;
+    --ivory-dim:#9AA8BD;
+    --ivory-faint:#5E6C82;
+    --brass:#7FA8D9;
+    --brass-bright:#A9CBF0;
+    --brass-dim:#4C6D96;
+    --emerald:#4C9083;
+    --oxblood:#B15A5A;
+    --ink-rgb:10,15,23;
+  }
+  html[data-theme="verdant"]{
+    --ink:#0C120D;
+    --panel:#141C15;
+    --panel-2:#1A241B;
+    --line:#2B3B2C;
+    --line-soft:#212D22;
+    --ivory:#EBF0E7;
+    --ivory-dim:#A2B39D;
+    --ivory-faint:#697A66;
+    --brass:#C2A75A;
+    --brass-bright:#E0C57E;
+    --brass-dim:#8A7640;
+    --emerald:#5B9470;
+    --oxblood:#A85248;
+    --ink-rgb:12,18,13;
+  }
+  html[data-theme="rosewood"]{
+    --ink:#150E10;
+    --panel:#1E1417;
+    --panel-2:#25181C;
+    --line:#3B252A;
+    --line-soft:#2C1D20;
+    --ivory:#F2E9EA;
+    --ivory-dim:#B39BA0;
+    --ivory-faint:#7A6367;
+    --brass:#C98F6B;
+    --brass-bright:#E5B08A;
+    --brass-dim:#8F5F45;
+    --emerald:#5C8F73;
+    --oxblood:#B3564F;
+    --ink-rgb:21,14,16;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--ink);
+    color:var(--ivory);
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    min-height:100vh;
+  }
+
+  ::selection{background:var(--brass-dim);color:var(--ink);}
+
+  a{color:inherit;text-decoration:none;}
+
+  .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
+
+  /* ---------- Ruler rule, the signature motif ---------- */
+  .ruler{
+    position:relative;
+    height:9px;
+    background-image:repeating-linear-gradient(
+      to right,
+      var(--line) 0, var(--line) 1px,
+      transparent 1px, transparent 24px
+    );
+    background-position:0 bottom;
+    background-repeat:repeat-x;
+    background-size:auto 5px;
+    opacity:.7;
+  }
+  .ruler::after{
+    content:"";
+    position:absolute;left:0;right:0;bottom:0;
+    height:1px;background:var(--line);
+  }
+  .ruler.accent::after{background:var(--brass-dim);}
+
+  /* ============ SIDEBAR ============ */
+  .sidebar{
+    width:248px;
+    flex-shrink:0;
+    background:var(--panel);
+    border-right:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    position:sticky;
+    top:0;
+    height:100vh;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:26px 22px 20px;
+  }
+  .brand-mark{
+    width:30px;height:30px;
+    border:1px solid var(--brass-dim);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .brand-mark::before{
+    content:"";
+    width:10px;height:10px;
+    border-radius:50%;
+    background:var(--brass);
+  }
+  .brand-word{
+    font-family:'Fraunces',serif;
+    font-size:19px;
+    letter-spacing:0.06em;
+    font-weight:500;
+  }
+  .brand-sub{
+    font-size:10px;
+    letter-spacing:0.18em;
+    color:var(--ivory-faint);
+    text-transform:uppercase;
+    margin-top:2px;
+  }
+
+  nav{padding:10px 12px;flex:1;}
+  .nav-label{
+    font-size:10px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--ivory-faint);
+    padding:16px 12px 8px;
+  }
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:9px 12px;
+    border-radius:var(--radius);
+    color:var(--ivory-dim);
+    font-size:13.5px;
+    position:relative;
+    cursor:pointer;
+    transition:color .2s ease, background .2s ease;
+  }
+  .nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.8;}
+  .nav-item span.tag{
+    margin-left:auto;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--brass-dim);
+    border:1px solid var(--line);
+    padding:1px 6px;
+    border-radius:20px;
+  }
+  .nav-item:hover{color:var(--ivory);background:var(--panel-2);}
+  .nav-item.active{color:var(--ivory);}
+  .nav-item.active::before{
+    content:"";
+    position:absolute;left:-12px;top:50%;transform:translateY(-50%);
+    width:2px;height:16px;background:var(--brass);
+  }
+  .nav-item.active{background:var(--panel-2);}
+
+  .sidebar-foot{
+    padding:16px;
+    border-top:1px solid var(--line);
+  }
+  .profile-card{
+    display:flex;align-items:center;gap:10px;
+    padding:8px;border-radius:var(--radius);
+    cursor:pointer;
+    transition:background .2s ease;
+  }
+  .profile-card:hover{background:var(--panel-2);}
+  .avatar-ring{
+    width:34px;height:34px;border-radius:50%;
+    background:var(--panel-2);
+    border:1px solid var(--brass-dim);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;
+    font-size:13px;color:var(--brass-bright);
+    flex-shrink:0;
+  }
+  .profile-name{font-size:13px;font-weight:500;}
+  .profile-role{font-size:11px;color:var(--ivory-faint);}
+
+  /* ============ MAIN ============ */
+  main{flex:1;min-width:0;padding:0 0 60px;}
+
+  .topbar{
+    display:flex;align-items:center;gap:20px;
+    padding:20px 40px;
+    border-bottom:1px solid var(--line);
+    position:sticky;top:0;
+    background:rgba(var(--ink-rgb),.92);
+    backdrop-filter:blur(6px);
+    z-index:10;
+  }
+  .search{
+    flex:1;max-width:360px;
+    display:flex;align-items:center;gap:8px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:8px 12px;
+    color:var(--ivory-faint);
+  }
+  .search svg{width:14px;height:14px;opacity:.7;}
+  .search input{
+    background:none;border:none;outline:none;color:var(--ivory);
+    font-size:13px;width:100%;font-family:'Inter',sans-serif;
+  }
+  .search input::placeholder{color:var(--ivory-faint);}
+  .topbar-spacer{flex:1;}
+
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;font-weight:500;
+    padding:9px 16px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    border:1px solid transparent;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:all .2s ease;
+    letter-spacing:0.01em;
+  }
+  .btn svg{width:13px;height:13px;}
+  .btn-primary{
+    background:var(--brass);color:var(--ink);
+    font-weight:600;
+  }
+  .btn-primary:hover{background:var(--brass-bright);}
+  .btn-ghost{
+    border-color:var(--line);color:var(--ivory-dim);
+    background:transparent;
+  }
+  .btn-ghost:hover{border-color:var(--brass-dim);color:var(--ivory);}
+
+  .icon-btn{
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);border-radius:var(--radius);
+    color:var(--ivory-dim);cursor:pointer;
+    position:relative;
+    transition:all .2s ease;
+  }
+  .icon-btn svg{width:15px;height:15px;}
+  .icon-btn:hover{color:var(--ivory);border-color:var(--brass-dim);}
+  .icon-btn .dot{
+    position:absolute;top:6px;right:6px;
+    width:6px;height:6px;border-radius:50%;
+    background:var(--oxblood);
+  }
+
+  .content{padding:36px 40px 0;}
+
+  .page-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:22px;
+    animation:rise .5s ease both;
+  }
+  .eyebrow{
+    font-size:11px;letter-spacing:0.18em;text-transform:uppercase;
+    color:var(--brass-dim);margin-bottom:8px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:400;font-size:32px;
+    letter-spacing:0.01em;
+  }
+  h1 em{font-style:italic;color:var(--brass-bright);}
+  .page-date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;color:var(--ivory-faint);
+    text-align:right;
+  }
+
+  /* ---------- Stat row ---------- */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin-bottom:32px;
+    animation:rise .6s ease both;
+    animation-delay:.05s;
+  }
+  .stat{
+    background:var(--panel);
+    padding:20px 22px;
+  }
+  .stat-label{
+    font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+    color:var(--ivory-faint);margin-bottom:14px;
+  }
+  .stat-value{
+    font-family:'Fraunces',serif;
+    font-size:27px;font-weight:400;
+    margin-bottom:8px;
+  }
+  .stat-value .cents{font-size:16px;color:var(--ivory-faint);}
+  .stat-trend{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    display:flex;align-items:center;gap:5px;
+  }
+  .stat-trend.up{color:var(--emerald);}
+  .stat-trend.down{color:var(--oxblood);}
+  .stat-trend svg{width:10px;height:10px;}
+
+  /* ---------- Two column ---------- */
+  .grid-2{
+    display:grid;
+    grid-template-columns:1.6fr 1fr;
+    gap:24px;
+    margin-bottom:32px;
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    animation:rise .6s ease both;
+    animation-delay:.1s;
+  }
+  .panel-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 22px;
+  }
+  .panel-title{
+    font-family:'Fraunces',serif;font-size:17px;font-weight:500;
+  }
+  .panel-link{
+    font-size:11.5px;color:var(--brass-dim);
+    display:flex;align-items:center;gap:4px;
+    cursor:pointer;
+    transition:color .2s ease;
+  }
+  .panel-link:hover{color:var(--brass-bright);}
+
+  /* ---------- Pipeline ---------- */
+  .pipeline{padding:6px 22px 20px;}
+  .stage{
+    padding:14px 0;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .stage:last-child{border-bottom:none;}
+  .stage-top{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin-bottom:9px;
+  }
+  .stage-name{font-size:13.5px;font-weight:500;}
+  .stage-meta{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ivory-faint);}
+  .stage-meta b{color:var(--ivory);font-weight:500;}
+  .bar-track{
+    height:5px;background:var(--line-soft);border-radius:20px;overflow:hidden;
+    margin-bottom:10px;
+  }
+  .bar-fill{
+    height:100%;border-radius:20px;
+    background:linear-gradient(90deg,var(--brass-dim),var(--brass));
+  }
+  .stage-clients{
+    display:flex;gap:6px;flex-wrap:wrap;
+  }
+  .chip{
+    font-size:11px;
+    padding:4px 9px;
+    border:1px solid var(--line);
+    border-radius:20px;
+    color:var(--ivory-dim);
+  }
+
+  /* ---------- Activity ---------- */
+  .activity{padding:6px 22px 20px;}
+  .a-item{
+    display:flex;gap:12px;
+    padding:13px 0;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .a-item:last-child{border-bottom:none;}
+  #documents-list .a-item{cursor:pointer;transition:background .15s;margin:0 -22px;padding:13px 22px;}
+  #documents-list .a-item:hover{background:var(--panel-2);}
+  .a-text small{display:block;color:var(--ivory-faint);font-weight:400;margin-top:2px;font-size:12px;}
+  .a-dot{
+    width:7px;height:7px;border-radius:50%;
+    margin-top:6px;flex-shrink:0;
+    background:var(--brass);
+  }
+  .a-dot.meeting{background:var(--emerald);}
+  .a-dot.alert{background:var(--oxblood);}
+  .a-text{font-size:13px;color:var(--ivory-dim);line-height:1.5;}
+  .a-text b{color:var(--ivory);font-weight:500;}
+  .a-time{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ivory-faint);margin-top:4px;display:block;}
+
+  /* ---------- Client ledger ---------- */
+  .ledger-panel{
+    animation:rise .6s ease both;animation-delay:.15s;
+  }
+  table{width:100%;border-collapse:collapse;}
+  thead th{
+    text-align:left;
+    font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;
+    color:var(--ivory-faint);font-weight:500;
+    padding:0 22px 12px;
+  }
+  thead th:first-child{padding-left:22px;}
+  tbody tr{
+    border-top:1px solid var(--line-soft);
+    transition:background .2s ease;
+    cursor:pointer;
+  }
+  tbody tr:hover{background:var(--panel-2);}
+  tbody td{padding:14px 22px;font-size:13px;vertical-align:middle;}
+
+  .client-cell{display:flex;align-items:center;gap:12px;}
+  .client-avatar{
+    width:32px;height:32px;border-radius:50%;
+    background:var(--panel-2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-size:12px;color:var(--brass-bright);
+    flex-shrink:0;
+  }
+  .client-name{font-weight:500;}
+  .client-sub{font-size:11.5px;color:var(--ivory-faint);margin-top:1px;}
+
+  .tier{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11px;padding:4px 10px;border-radius:20px;
+    border:1px solid var(--line);
+  }
+  .tier::before{content:"";width:6px;height:6px;border-radius:50%;}
+  .tier.private{color:var(--brass-bright);border-color:var(--brass-dim);}
+  .tier.private::before{background:var(--brass);}
+  .tier.gold{color:#D8C79A;border-color:var(--line);}
+  .tier.gold::before{background:#B7A06A;}
+  .tier.standard{color:var(--ivory-dim);border-color:var(--line);}
+  .tier.standard::before{background:var(--ivory-faint);}
+
+  .rm-cell{display:flex;align-items:center;gap:8px;color:var(--ivory-dim);}
+  .rm-dot{width:20px;height:20px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--ivory-dim);}
+
+  .status-dot{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ivory-dim);}
+  .status-dot::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--emerald);}
+  .status-dot.idle::before{background:var(--ivory-faint);}
+
+  .ledger-foot{
+    padding:16px 22px;
+    display:flex;justify-content:space-between;align-items:center;
+    color:var(--ivory-faint);font-size:11.5px;
+  }
+
+  @keyframes rise{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+
+  @media (max-width:1100px){
+    .grid-2{grid-template-columns:1fr;}
+    .stats{grid-template-columns:repeat(2,1fr);}
+  }
+  .menu-btn{display:none;}
+  @media (max-width:820px){
+    .menu-btn{display:flex;}
+    .sidebar{
+      position:fixed;left:0;top:0;height:100vh;z-index:150;
+      transform:translateX(-100%);transition:transform .25s ease;
+    }
+    .sidebar.open{transform:translateX(0);box-shadow:0 0 40px rgba(0,0,0,.5);}
+    .sidebar-scrim{
+      display:none;position:fixed;inset:0;background:rgba(8,7,5,.6);z-index:140;
+    }
+    .sidebar-scrim.open{display:block;}
+    .content, .topbar{padding-left:20px;padding-right:20px;}
+    .stats{grid-template-columns:1fr 1fr;}
+    thead{display:none;}
+    tbody td{display:block;padding:6px 20px;}
+    tbody tr{padding:10px 0;}
+  }
+
+  /* ---------- Views ---------- */
+  .view{display:none;}
+  .view.active{display:block;animation:rise .4s ease both;}
+
+  /* ---------- Dropdowns ---------- */
+  .dropdown{
+    position:absolute;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    min-width:200px;
+    box-shadow:0 12px 28px rgba(0,0,0,.45);
+    padding:6px;
+    z-index:100;
+    display:none;
+  }
+  .dropdown.open{display:block;}
+  .dropdown-title{
+    font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ivory-faint);padding:8px 10px 6px;
+  }
+  .dropdown-item{
+    padding:9px 10px;font-size:13px;border-radius:var(--radius);
+    cursor:pointer;color:var(--ivory-dim);
+  }
+  .dropdown-item:hover{background:var(--panel);color:var(--ivory);}
+  .dropdown-item.danger:hover{color:var(--oxblood);}
+  #profile-dropdown{bottom:64px;left:16px;right:16px;min-width:0;}
+  .notif-dropdown{top:44px;right:0;width:300px;}
+  .notif-empty{padding:16px 10px;color:var(--ivory-faint);font-size:12.5px;}
+  .notif-row{
+    padding:10px;border-radius:var(--radius);cursor:pointer;
+    display:flex;gap:9px;align-items:flex-start;
+  }
+  .notif-row:hover{background:var(--panel);}
+  .notif-row .a-dot{margin-top:5px;}
+  .notif-row .a-text{font-size:12.5px;color:var(--ivory-dim);line-height:1.4;}
+  .icon-btn{position:relative;}
+
+  /* ---------- Toolbar controls ---------- */
+  .clients-toolbar{flex-wrap:wrap;gap:10px;}
+  .toolbar-controls{display:flex;gap:8px;flex-wrap:wrap;}
+  .mini-input,.mini-select{
+    background:var(--panel);border:1px solid var(--line);
+    color:var(--ivory);font-family:'Inter',sans-serif;font-size:12.5px;
+    padding:7px 10px;border-radius:var(--radius);outline:none;
+  }
+  .mini-input:focus,.mini-select:focus{border-color:var(--brass-dim);}
+  .mini-input::placeholder{color:var(--ivory-faint);}
+  tbody tr.clickable{cursor:pointer;}
+
+  /* ---------- Amount unit selector ---------- */
+  .unit-select-wrap{display:flex;align-items:center;gap:8px;}
+  .unit-select-label{font-size:11px;color:var(--ivory-faint);white-space:nowrap;}
+
+  /* ---------- Theme switcher ---------- */
+  .theme-dropdown{top:44px;right:0;width:212px;}
+  .theme-grid{display:flex;flex-direction:column;gap:1px;}
+  .theme-swatch{
+    display:flex;align-items:center;gap:10px;
+    width:100%;padding:8px 10px;border:none;background:none;
+    border-radius:var(--radius);cursor:pointer;
+    font-family:'Inter',sans-serif;font-size:12.5px;color:var(--ivory-dim);
+    text-align:left;transition:background .15s ease,color .15s ease;
+  }
+  .theme-swatch:hover{background:var(--panel);color:var(--ivory);}
+  .theme-swatch.active{background:var(--panel);color:var(--ivory);}
+  .swatch-dot{
+    width:16px;height:16px;border-radius:50%;
+    flex-shrink:0;position:relative;
+    box-shadow:inset 0 0 0 6px var(--dot-accent);
+    border:1px solid rgba(255,255,255,.18);
+  }
+  .theme-swatch.active .swatch-dot{box-shadow:inset 0 0 0 6px var(--dot-accent),0 0 0 2px var(--brass-dim);}
+
+  /* ---------- Sidebar promo card ---------- */
+  .promo-card{
+    margin:4px 16px 14px;
+    padding:13px 14px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel-2);
+    position:relative;
+  }
+  .promo-card.hidden{display:none;}
+  .promo-dismiss{
+    position:absolute;top:7px;right:7px;
+    width:18px;height:18px;
+    display:flex;align-items:center;justify-content:center;
+    background:none;border:none;color:var(--ivory-faint);
+    cursor:pointer;font-size:13px;line-height:1;border-radius:50%;
+    font-family:'Inter',sans-serif;
+  }
+  .promo-dismiss:hover{color:var(--ivory);background:var(--panel);}
+  .promo-eyebrow{
+    font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ivory-faint);margin-bottom:5px;
+  }
+  .promo-name{
+    font-family:'Fraunces',serif;font-size:13.5px;color:var(--brass-bright);
+    margin-bottom:5px;line-height:1.3;
+  }
+  .promo-detail{font-size:11px;color:var(--ivory-dim);margin-bottom:7px;line-height:1.4;}
+  .promo-phone{
+    display:flex;align-items:center;gap:6px;
+    font-size:11.5px;color:var(--brass);
+  }
+  .promo-phone svg{width:11px;height:11px;flex-shrink:0;}
+  .promo-phone:hover{color:var(--brass-bright);}
+
+  /* ---------- Selection / bulk actions ---------- */
+  th.checkbox-th, td.checkbox-cell{width:38px;padding-left:22px !important;padding-right:6px !important;}
+  input[type="checkbox"].row-select, #clients-select-all{
+    width:15px;height:15px;accent-color:var(--brass);cursor:pointer;
+  }
+  .bulk-bar{
+    display:none;align-items:center;gap:12px;
+    padding:10px 22px;border-bottom:1px solid var(--line-soft);
+    background:var(--panel-2);font-size:12.5px;color:var(--ivory-dim);
+  }
+  .bulk-bar.open{display:flex;}
+  .bulk-bar b{color:var(--ivory);}
+  .bulk-bar .btn{padding:6px 12px;font-size:12px;}
+  .bulk-bar .btn-danger{border:1px solid var(--oxblood);color:var(--oxblood);background:transparent;}
+  .bulk-bar .btn-danger:hover{background:var(--oxblood);color:var(--ivory);}
+  .bulk-bar-spacer{flex:1;}
+
+  /* ---------- Detail modal head actions ---------- */
+  .modal-head-actions{display:flex;align-items:center;gap:14px;}
+  .modal-head-actions .btn{padding:6px 12px;font-size:12px;}
+  .btn-danger-ghost{border:1px solid var(--oxblood);color:var(--oxblood);background:transparent;}
+  .btn-danger-ghost:hover{background:var(--oxblood);color:var(--ivory);}
+
+  .pager{display:flex;gap:6px;align-items:center;}
+  .pager button{
+    background:var(--panel);border:1px solid var(--line);color:var(--ivory-dim);
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;
+    padding:5px 10px;border-radius:var(--radius);cursor:pointer;
+  }
+  .pager button:hover:not(:disabled){border-color:var(--brass-dim);color:var(--ivory);}
+  .pager button:disabled{opacity:.35;cursor:default;}
+  .pager span{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ivory-faint);}
+
+  /* ---------- Kanban ---------- */
+  .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .kan-col{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;min-height:120px;}
+  .kan-head{padding:14px 16px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;}
+  .kan-title{font-family:'Fraunces',serif;font-size:15px;}
+  .kan-meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ivory-faint);}
+  .kan-body{padding:10px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .kan-card{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:11px 12px;cursor:grab;
+  }
+  .kan-card:active{cursor:grabbing;}
+  .kan-card.dragging{opacity:.4;}
+  .kan-card .kc-name{font-size:13px;font-weight:500;margin-bottom:4px;}
+  .kan-card .kc-amt{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--brass-dim);}
+  .kan-empty{padding:20px 12px;text-align:center;color:var(--ivory-faint);font-size:12px;}
+  .kan-col.drag-over{border-color:var(--brass-dim);}
+  @media (max-width:1100px){.kanban{grid-template-columns:1fr 1fr;}}
+  @media (max-width:600px){.kanban{grid-template-columns:1fr;}}
+
+  /* ---------- Portfolio bars reuse .stage but with pct label ---------- */
+  .pf-row{padding:14px 22px;border-bottom:1px solid var(--line-soft);}
+  .pf-row:last-child{border-bottom:none;}
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(8,7,5,.72);
+    display:none;align-items:center;justify-content:center;z-index:200;
+    padding:20px;backdrop-filter:blur(3px);
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    width:100%;max-width:460px;max-height:86vh;overflow:auto;
+    animation:rise .25s ease both;
+  }
+  .modal-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 22px;border-bottom:1px solid var(--line);
+  }
+  .modal-title{font-family:'Fraunces',serif;font-size:18px;}
+  .modal-close{cursor:pointer;color:var(--ivory-faint);font-size:20px;line-height:1;}
+  .modal-close:hover{color:var(--ivory);}
+  .modal-body{padding:20px 22px;}
+
+  .form-grid{display:grid;gap:14px;}
+  .form-grid label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--ivory-dim);}
+  .form-grid input,.form-grid select,.form-grid textarea{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--ivory);
+    font-family:'Inter',sans-serif;font-size:13px;padding:9px 11px;border-radius:var(--radius);outline:none;
+  }
+  .form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{border-color:var(--brass-dim);}
+  .form-actions{display:flex;gap:10px;margin-top:4px;}
+
+  /* ---------- Trial badge ---------- */
+  .trial-badge{
+    display:flex;align-items:center;gap:7px;
+    padding:7px 12px;border:1px solid var(--line);border-radius:var(--radius);
+    font-size:11.5px;color:var(--ivory-dim);cursor:pointer;
+    background:var(--panel);transition:border-color .2s ease,color .2s ease;
+  }
+  .trial-badge:hover{border-color:var(--brass-dim);color:var(--ivory);}
+  .trial-dot{width:6px;height:6px;border-radius:50%;background:var(--brass);flex-shrink:0;}
+  .trial-badge.urgent .trial-dot{background:var(--oxblood);}
+  .trial-badge.urgent{border-color:var(--oxblood);color:var(--oxblood);}
+
+  /* ---------- License lock screen ---------- */
+  .lock-overlay{
+    position:fixed;inset:0;background:var(--ink);
+    display:none;align-items:center;justify-content:center;z-index:500;
+    padding:20px;
+  }
+  .lock-overlay.open{display:flex;}
+  .lock-card{
+    width:100%;max-width:380px;
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:34px 28px;text-align:center;
+    animation:rise .4s ease both;
+  }
+  .lock-title{font-family:'Fraunces',serif;font-size:21px;font-weight:500;margin-bottom:10px;}
+  .lock-sub{font-size:12.5px;color:var(--ivory-dim);line-height:1.6;margin-bottom:22px;}
+  .lock-input{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ivory);
+    font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.04em;text-align:center;
+    padding:11px 14px;border-radius:var(--radius);outline:none;margin-bottom:10px;
+  }
+  .lock-input:focus{border-color:var(--brass-dim);}
+  .lock-error{font-size:11.5px;color:var(--oxblood);min-height:16px;margin-bottom:10px;}
+  .lock-contact{
+    margin-top:22px;padding-top:16px;border-top:1px solid var(--line-soft);
+    font-size:11px;color:var(--ivory-faint);line-height:1.6;
+  }
+  .lock-contact a{color:var(--brass);}
+  .lock-contact a:hover{color:var(--brass-bright);}
+  .duration-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .duration-grid .btn{width:100%;justify-content:center;}
+  .duration-grid .btn:last-child:nth-child(odd){grid-column:1 / -1;}
+
+  .detail-head{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+  .detail-avatar{
+    width:48px;height:48px;border-radius:50%;background:var(--panel-2);border:1px solid var(--brass-dim);
+    display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:17px;color:var(--brass-bright);
+    flex-shrink:0;
+  }
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;margin-bottom:18px;}
+  .detail-item .dl{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ivory-faint);margin-bottom:4px;}
+  .detail-item .dv{font-size:13.5px;}
+  .detail-notes{border-top:1px solid var(--line-soft);padding-top:14px;}
+  .detail-notes textarea{width:100%;min-height:70px;resize:vertical;}
+
+  /* ---------- Follow-up tasks ---------- */
+  .task-group-label{
+    font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ivory-faint);padding:16px 22px 8px;
+  }
+  .task-group-label:first-child{padding-top:6px;}
+  .task-item{
+    display:flex;align-items:flex-start;gap:12px;
+    padding:13px 22px;border-bottom:1px solid var(--line-soft);
+  }
+  .task-item:last-child{border-bottom:none;}
+  .task-check{
+    width:17px;height:17px;border-radius:50%;
+    border:1px solid var(--line);background:transparent;
+    flex-shrink:0;margin-top:2px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    color:transparent;transition:all .15s ease;
+  }
+  .task-check:hover{border-color:var(--brass-dim);}
+  .task-check svg{width:10px;height:10px;}
+  .task-item.done .task-check{background:var(--emerald);border-color:var(--emerald);color:var(--ink);}
+  .task-item.done .task-title{color:var(--ivory-faint);text-decoration:line-through;}
+  .task-body{flex:1;min-width:0;}
+  .task-title{font-size:13px;color:var(--ivory-dim);line-height:1.4;}
+  .task-title b{color:var(--ivory);font-weight:500;}
+  .task-meta{display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;}
+  .due-badge{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+    padding:2px 8px;border-radius:20px;border:1px solid var(--line);
+    color:var(--ivory-faint);
+  }
+  .due-badge.overdue{color:var(--oxblood);border-color:var(--oxblood);}
+  .due-badge.today{color:var(--brass-bright);border-color:var(--brass-dim);}
+  .task-del{
+    color:var(--ivory-faint);cursor:pointer;font-size:16px;line-height:1;
+    flex-shrink:0;padding:2px 4px;
+  }
+  .task-del:hover{color:var(--oxblood);}
+  .task-empty{padding:20px 22px;color:var(--ivory-faint);font-size:12.5px;}
+
+  /* ---------- Mini lists nested in the client detail modal ---------- */
+  .detail-subhead{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:8px;
+  }
+  .detail-subhead .dl{margin-bottom:0;}
+  .mini-list{border-top:1px solid var(--line-soft);padding-top:14px;margin-top:16px;}
+  .mini-list-item{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:8px 0;font-size:12.5px;color:var(--ivory-dim);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .mini-list-item:last-child{border-bottom:none;}
+  .mini-list-empty{font-size:12px;color:var(--ivory-faint);padding:4px 0;}
+  .link-btn{
+    background:none;border:none;color:var(--brass-dim);font-size:11.5px;
+    cursor:pointer;font-family:'Inter',sans-serif;padding:0;
+  }
+  .link-btn:hover{color:var(--brass-bright);}
+
+  /* ---------- Toast ---------- */
+  .toast-wrap{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:8px;z-index:300;}
+  .toast{
+    background:var(--panel-2);border:1px solid var(--brass-dim);border-radius:var(--radius);
+    padding:12px 16px;font-size:12.5px;color:var(--ivory);
+    box-shadow:0 10px 24px rgba(0,0,0,.4);
+    animation:toast-in .25s ease both;
+  }
+  @keyframes toast-in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div>
+      <div class="brand-word">Aureum</div>
+      <div class="brand-sub">Private Client Suite</div>
+    </div>
+  </div>
+  <div class="ruler"></div>
+
+  <nav>
+    <div class="nav-label">Overview</div>
+    <div class="nav-item active" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" data-view="clients">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.2c2.6.3 4.5 2.6 4.5 5.8"/></svg>
+      Clients
+      <span class="tag" id="nav-tag-clients">148</span>
+    </div>
+    <div class="nav-item" data-view="pipeline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4h18l-7 9v6l-4 2v-8L3 4Z"/></svg>
+      Pipeline
+      <span class="tag" id="nav-tag-pipeline">12</span>
+    </div>
+    <div class="nav-item" data-view="portfolio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+      Portfolio
+    </div>
+    <div class="nav-item" data-view="tasks">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Follow-ups
+      <span class="tag" id="nav-tag-tasks">0</span>
+    </div>
+
+    <div class="nav-label">Records</div>
+    <div class="nav-item" data-view="activity">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+      Activity
+    </div>
+    <div class="nav-item" data-view="documents">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/></svg>
+      Documents
+    </div>
+
+    <div class="nav-label">System</div>
+    <div class="nav-item" data-view="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+      Settings
+    </div>
+  </nav>
+
+  <div class="promo-card" id="promo-card">
+    <button type="button" class="promo-dismiss" id="promo-dismiss" aria-label="Dismiss">×</button>
+    <div class="promo-eyebrow">Crafted by</div>
+    <div class="promo-name">Vyomora Technologies</div>
+    <div class="promo-detail">Bilaspur, Chhattisgarh 495004</div>
+    <a class="promo-phone" href="tel:+918463083061">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 6a2 2 0 0 1 2-2Z"/></svg>
+      +91 84630 83061
+    </a>
+  </div>
+
+  <div class="sidebar-foot">
+    <div class="profile-card" id="profile-card">
+      <div class="avatar-ring" id="profile-avatar">RA</div>
+      <div>
+        <div class="profile-name" id="profile-name-label">Rohan Advani</div>
+        <div class="profile-role" id="profile-role-label">Senior Relationship Mgr.</div>
+      </div>
+    </div>
+    <div class="dropdown" id="profile-dropdown">
+      <div class="dropdown-item" data-action="goto-settings">Edit profile</div>
+      <div class="dropdown-item" data-action="unlock-license">Manage license</div>
+      <div class="dropdown-item" data-action="reset-demo">Reset demo data</div>
+      <div class="dropdown-item danger" data-action="sign-out">Sign out</div>
+    </div>
+  </div>
+</aside>
+<div class="sidebar-scrim" id="sidebar-scrim"></div>
+
+<main>
+  <div class="topbar">
+    <div class="icon-btn menu-btn" id="menu-btn" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="global-search" placeholder="Search clients, deals, documents…" autocomplete="off">
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="trial-badge" id="trial-badge" style="display:none;">
+      <span class="trial-dot"></span>
+      <span id="trial-badge-text">Trial</span>
+    </div>
+    <div class="unit-select-wrap">
+      <span class="unit-select-label">Amounts in</span>
+      <select id="amount-unit-select" class="mini-select">
+        <option value="crore">Crore (Cr)</option>
+        <option value="lakh">Lakh (L)</option>
+        <option value="thousand">Thousand (K)</option>
+        <option value="absolute">Absolute (₹)</option>
+      </select>
+    </div>
+    <div class="icon-btn" id="theme-btn" aria-label="Change theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 21a9 9 0 1 1 0-18c4.5 0 8 3.2 8 6.8 0 2.4-1.8 4-4 4h-1.6c-1 0-1.7.9-1.4 1.8.2.6.6 1 .6 1.6 0 1.6-1.4 2.8-1.6 2.8Z"/><circle cx="7.2" cy="12.5" r="1.15" fill="currentColor" stroke="none"/><circle cx="9.6" cy="8.2" r="1.15" fill="currentColor" stroke="none"/><circle cx="14.6" cy="7.6" r="1.15" fill="currentColor" stroke="none"/><circle cx="17.2" cy="11.4" r="1.15" fill="currentColor" stroke="none"/></svg>
+      <div class="dropdown theme-dropdown" id="theme-dropdown">
+        <div class="dropdown-title">Theme</div>
+        <div class="theme-grid" id="theme-grid">
+          <button type="button" class="theme-swatch" data-theme="noir"><span class="swatch-dot" style="--dot-accent:#C6A15B;background:#0F0D0B;"></span>Aureum Noir</button>
+          <button type="button" class="theme-swatch" data-theme="ivory"><span class="swatch-dot" style="--dot-accent:#A9803F;background:#F4F0E5;"></span>Ivory Daylight</button>
+          <button type="button" class="theme-swatch" data-theme="sapphire"><span class="swatch-dot" style="--dot-accent:#7FA8D9;background:#0A0F17;"></span>Midnight Sapphire</button>
+          <button type="button" class="theme-swatch" data-theme="verdant"><span class="swatch-dot" style="--dot-accent:#C2A75A;background:#0C120D;"></span>Verdant Ledger</button>
+          <button type="button" class="theme-swatch" data-theme="rosewood"><span class="swatch-dot" style="--dot-accent:#C98F6B;background:#150E10;"></span>Rosewood</button>
+        </div>
+      </div>
+    </div>
+    <div class="icon-btn" id="notif-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      <span class="dot" id="notif-dot"></span>
+      <div class="dropdown notif-dropdown" id="notif-dropdown">
+        <div class="dropdown-title">Notifications</div>
+        <div id="notif-list"></div>
+      </div>
+    </div>
+    <button class="btn btn-ghost" id="export-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/></svg>
+      Export
+    </button>
+    <button class="btn btn-primary" id="new-client-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      New Client
+    </button>
+  </div>
+
+  <div class="content">
+
+  <section class="view active" id="view-dashboard">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Relationship Overview</div>
+        <h1 id="greet-heading">Good evening, <em id="greet-name">Rohan</em></h1>
+      </div>
+      <div class="page-date" id="page-date"></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Assets Under Management</div>
+        <div class="stat-value num" id="aum">₹0</div>
+        <div class="stat-trend up">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 17 10 11 14 15 20 7"/><path d="M14 7h6v6"/></svg>
+          4.8% this quarter
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Active Clients</div>
+        <div class="stat-value num" id="stat-active">148</div>
+        <div class="stat-trend up">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 17 10 11 14 15 20 7"/><path d="M14 7h6v6"/></svg>
+          <span id="stat-new-month">6 new this month</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Open Opportunities</div>
+        <div class="stat-value num" id="stat-open-opp">₹4.2<span class="cents">Cr</span></div>
+        <div class="stat-trend up">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 17 10 11 14 15 20 7"/><path d="M14 7h6v6"/></svg>
+          <span id="stat-pipeline-count">12 in pipeline</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Attrition Risk</div>
+        <div class="stat-value num" id="stat-risk">3</div>
+        <div class="stat-trend down">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 7 10 13 14 9 20 17"/><path d="M14 17h6v-6"/></svg>
+          flagged for review
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Pipeline by Stage</div>
+          <div class="panel-link" data-goto="pipeline">View all
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+        </div>
+        <div class="ruler"></div>
+        <div class="pipeline" id="dash-pipeline"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Recent Activity</div>
+          <div class="panel-link" data-goto="activity">Log
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+        </div>
+        <div class="ruler"></div>
+        <div class="activity" id="dash-activity"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:32px;">
+      <div class="panel-head">
+        <div class="panel-title">Upcoming Follow-ups</div>
+        <div class="panel-link" data-goto="tasks">View all
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+      <div class="ruler"></div>
+      <div id="dash-tasks"></div>
+    </div>
+
+    <div class="panel ledger-panel">
+      <div class="panel-head">
+        <div class="panel-title">Client Ledger</div>
+        <div class="panel-link" data-goto="clients">Open full ledger
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+      <div class="ruler accent"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Tier</th>
+            <th>AUM</th>
+            <th>Relationship Manager</th>
+            <th>Last Contact</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="dash-ledger-body"></tbody>
+      </table>
+      <div class="ledger-foot">
+        <span id="dash-ledger-count">Showing 6 of 148 relationships</span>
+        <span>Ledger last reconciled 08 Aug 2026, 06:00 IST</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-clients">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Records</div>
+        <h1>Client <em>Ledger</em></h1>
+      </div>
+    </div>
+    <div class="panel ledger-panel">
+      <div class="panel-head clients-toolbar">
+        <div class="panel-title">All Relationships</div>
+        <div class="toolbar-controls">
+          <input type="text" id="clients-search" class="mini-input" placeholder="Filter by name…">
+          <select id="clients-tier-filter" class="mini-select">
+            <option value="">All tiers</option>
+            <option value="private">Private</option>
+            <option value="gold">Gold</option>
+            <option value="standard">Standard</option>
+          </select>
+          <select id="clients-sort" class="mini-select">
+            <option value="name">Sort: Name</option>
+            <option value="aum-desc">Sort: AUM (high→low)</option>
+            <option value="aum-asc">Sort: AUM (low→high)</option>
+            <option value="contact">Sort: Last contact</option>
+          </select>
+        </div>
+      </div>
+      <div class="bulk-bar" id="clients-bulk-bar">
+        <span><b id="clients-selected-count">0</b> selected</span>
+        <div class="bulk-bar-spacer"></div>
+        <button class="btn btn-ghost" id="clients-clear-selection-btn">Clear selection</button>
+        <button class="btn btn-danger" id="clients-bulk-delete-btn">Delete selected</button>
+      </div>
+      <div class="ruler accent"></div>
+      <table>
+        <thead>
+          <tr>
+            <th class="checkbox-th"><input type="checkbox" id="clients-select-all" aria-label="Select all clients on this page"></th>
+            <th>Client</th>
+            <th>Tier</th>
+            <th>AUM</th>
+            <th>Relationship Manager</th>
+            <th>Last Contact</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="clients-body"></tbody>
+      </table>
+      <div class="ledger-foot">
+        <span id="clients-count"></span>
+        <div class="pager" id="clients-pager"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-pipeline">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Deal Flow</div>
+        <h1>Sales <em>Pipeline</em></h1>
+      </div>
+      <button class="btn btn-primary" id="add-deal-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Add Deal
+      </button>
+    </div>
+    <div class="kanban" id="kanban-board"></div>
+  </section>
+
+  <section class="view" id="view-portfolio">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Book of Business</div>
+        <h1>Portfolio <em>Composition</em></h1>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">AUM by Tier</div></div>
+        <div class="ruler"></div>
+        <div class="pipeline" id="portfolio-tier"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">AUM by Relationship Manager</div></div>
+        <div class="ruler"></div>
+        <div class="pipeline" id="portfolio-rm"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-tasks">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Book of Business</div>
+        <h1>Client <em>Follow-ups</em></h1>
+      </div>
+      <button class="btn btn-primary" id="add-task-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Add follow-up
+      </button>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">All Follow-ups</div></div>
+      <div class="ruler"></div>
+      <div id="tasks-list"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-activity">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Records</div>
+        <h1>Activity <em>Log</em></h1>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Full History</div></div>
+      <div class="ruler"></div>
+      <div class="activity" id="activity-full"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-documents">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Records</div>
+        <h1>Client <em>Documents</em></h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <select id="doc-upload-client" class="mini-select" title="Associate this upload with a client">
+          <option value="">No client (general)</option>
+        </select>
+        <label class="btn btn-primary" for="doc-upload" style="cursor:pointer;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Upload
+        </label>
+      </div>
+      <input type="file" id="doc-upload" style="display:none;">
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Repository</div></div>
+      <div class="ruler"></div>
+      <div class="activity" id="documents-list"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-settings">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">System</div>
+        <h1>Account <em>Settings</em></h1>
+      </div>
+    </div>
+    <div class="panel" style="max-width:480px;margin-bottom:24px;">
+      <div class="panel-head"><div class="panel-title">Your Profile</div></div>
+      <div class="ruler"></div>
+      <form id="settings-form" class="form-grid" style="padding:20px 22px;">
+        <label>Full name<input type="text" id="settings-name" required></label>
+        <label>Role<input type="text" id="settings-role" required></label>
+        <button type="submit" class="btn btn-primary" style="justify-self:start;">Save changes</button>
+      </form>
+    </div>
+
+    <div class="panel" style="max-width:480px;">
+      <div class="panel-head"><div class="panel-title">Appearance</div></div>
+      <div class="ruler"></div>
+      <div class="theme-grid" id="theme-grid-settings" style="padding:14px;">
+        <button type="button" class="theme-swatch" data-theme="noir"><span class="swatch-dot" style="--dot-accent:#C6A15B;background:#0F0D0B;"></span>Aureum Noir</button>
+        <button type="button" class="theme-swatch" data-theme="ivory"><span class="swatch-dot" style="--dot-accent:#A9803F;background:#F4F0E5;"></span>Ivory Daylight</button>
+        <button type="button" class="theme-swatch" data-theme="sapphire"><span class="swatch-dot" style="--dot-accent:#7FA8D9;background:#0A0F17;"></span>Midnight Sapphire</button>
+        <button type="button" class="theme-swatch" data-theme="verdant"><span class="swatch-dot" style="--dot-accent:#C2A75A;background:#0C120D;"></span>Verdant Ledger</button>
+        <button type="button" class="theme-swatch" data-theme="rosewood"><span class="swatch-dot" style="--dot-accent:#C98F6B;background:#150E10;"></span>Rosewood</button>
+      </div>
+    </div>
+  </section>
+
+  </div>
+</main>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-box"></div>
+</div>
+
+<div class="lock-overlay" id="lock-overlay">
+  <div class="lock-card">
+    <div class="brand-mark" style="margin:0 auto 14px;"></div>
+
+    <div id="lock-stage-password">
+      <div class="lock-title">Trial Period Ended</div>
+      <div class="lock-sub">Your 24-hour trial of Aureum has ended. Enter the unlock code to continue, or reach out to activate a subscription.</div>
+      <form id="lock-password-form">
+        <input type="password" id="lock-password-input" class="lock-input" placeholder="Unlock code" autocomplete="off">
+        <div class="lock-error" id="lock-password-error"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Unlock</button>
+      </form>
+      <div class="lock-contact">
+        Provided by Vyomora Technologies, Bilaspur CG 495004<br>
+        <a href="tel:+918463083061">+91 84630 83061</a>
+      </div>
+    </div>
+
+    <div id="lock-stage-duration" style="display:none;">
+      <div class="lock-title">Choose Access Period</div>
+      <div class="lock-sub">Code accepted. Select how long this device should stay unlocked.</div>
+      <div class="duration-grid" id="duration-grid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+'use strict';
+(function(){
+
+/* Apply any previously-chosen theme immediately, before the rest of the
+   app boots, so there's no flash of the default palette on reload. This
+   is just a fast local cache; DB.settings.theme (loaded later) remains
+   the source of truth and re-applies once loadDB() resolves. */
+const THEME_CACHE_KEY = 'aureum_theme_v1';
+const VALID_THEMES = ['noir','ivory','sapphire','verdant','rosewood'];
+try{
+  const cachedTheme = localStorage.getItem(THEME_CACHE_KEY);
+  if(cachedTheme && VALID_THEMES.includes(cachedTheme) && cachedTheme!=='noir'){
+    document.documentElement.setAttribute('data-theme', cachedTheme);
+  }
+}catch(e){ /* localStorage unavailable — default theme applies */ }
+
+/* ================= Trial / License gate =================
+   24-hour free trial starting from first load on a given browser.
+   After it lapses, the app is locked behind a full-screen overlay
+   until an unlock code is entered — at which point the person
+   entering it (the app owner) chooses how long to extend access.
+   This is a client-side speed-bump for a distributed static file,
+   not real DRM — anyone reading the source can see ADMIN_PASSWORD,
+   so swap it for your own value below before handing this file out. */
+const TRIAL_MS = 24*60*60*1000;
+const TRIAL_START_KEY = 'aureum_trial_start_v1';
+const LICENSE_KEY = 'aureum_license_expiry_v1';
+const ADMIN_PASSWORD = 'VYOMORA8463083061'; // change this to your own unlock code
+
+const DURATION_OPTIONS = [
+  { label:'7 Days',   ms: 7*24*60*60*1000 },
+  { label:'30 Days',  ms: 30*24*60*60*1000 },
+  { label:'90 Days',  ms: 90*24*60*60*1000 },
+  { label:'1 Year',   ms: 365*24*60*60*1000 },
+  { label:'Lifetime', ms: null }
+];
+
+function getTrialStart(){
+  try{
+    let t = localStorage.getItem(TRIAL_START_KEY);
+    if(!t){ t = Date.now().toString(); localStorage.setItem(TRIAL_START_KEY, t); }
+    return parseInt(t, 10);
+  }catch(e){ return Date.now(); }
+}
+function getLicenseExpiry(){
+  try{
+    const v = localStorage.getItem(LICENSE_KEY);
+    if(v==null) return null;
+    if(v==='lifetime') return Infinity;
+    return parseInt(v, 10);
+  }catch(e){ return null; }
+}
+function setLicenseExpiry(ms){
+  try{
+    if(ms===null) localStorage.setItem(LICENSE_KEY, 'lifetime');
+    else localStorage.setItem(LICENSE_KEY, (Date.now()+ms).toString());
+  }catch(e){ /* ignore */ }
+}
+function isLicensed(){
+  const exp = getLicenseExpiry();
+  return exp!=null && Date.now() < exp;
+}
+function trialEnd(){ return getTrialStart() + TRIAL_MS; }
+function isInTrial(){ return Date.now() < trialEnd(); }
+function isAccessAllowed(){ return isLicensed() || isInTrial(); }
+function accessExpiresAt(){ return isLicensed() ? getLicenseExpiry() : trialEnd(); }
+
+function fmtRemaining(ms){
+  if(ms===Infinity) return 'Lifetime';
+  if(ms<=0) return 'expired';
+  const totalMin = Math.ceil(ms/60000);
+  const d = Math.floor(totalMin/1440);
+  const h = Math.floor((totalMin%1440)/60);
+  const m = totalMin%60;
+  if(d>0) return `${d}d ${h}h left`;
+  if(h>0) return `${h}h ${m}m left`;
+  return `${m}m left`;
+}
+
+function renderTrialBadge(){
+  const badge = document.getElementById('trial-badge');
+  const text = document.getElementById('trial-badge-text');
+  if(!badge) return;
+  if(isLicensed() && getLicenseExpiry()===Infinity){
+    badge.style.display='none';
+    return;
+  }
+  if(!isAccessAllowed()){
+    badge.style.display='none';
+    return;
+  }
+  badge.style.display='flex';
+  const remaining = accessExpiresAt() - Date.now();
+  text.textContent = (isLicensed() ? 'Licensed — ' : 'Trial — ') + fmtRemaining(remaining);
+  badge.classList.toggle('urgent', !isLicensed() && remaining < 2*60*60*1000);
+}
+
+function showLockScreen(){
+  document.getElementById('lock-stage-password').style.display='block';
+  document.getElementById('lock-stage-duration').style.display='none';
+  const input = document.getElementById('lock-password-input');
+  if(input) input.value='';
+  const err = document.getElementById('lock-password-error');
+  if(err) err.textContent='';
+  document.getElementById('lock-overlay').classList.add('open');
+}
+function hideLockScreen(){
+  document.getElementById('lock-overlay').classList.remove('open');
+}
+
+function wireLockScreen(){
+  const form = document.getElementById('lock-password-form');
+  const input = document.getElementById('lock-password-input');
+  const err = document.getElementById('lock-password-error');
+  const durGrid = document.getElementById('duration-grid');
+
+  durGrid.innerHTML = DURATION_OPTIONS.map((opt, i)=>
+    `<button type="button" class="btn btn-ghost lock-duration-btn" data-idx="${i}">${opt.label}</button>`
+  ).join('');
+
+  form.addEventListener('submit', e=>{
+    e.preventDefault();
+    if(input.value === ADMIN_PASSWORD){
+      err.textContent='';
+      document.getElementById('lock-stage-password').style.display='none';
+      document.getElementById('lock-stage-duration').style.display='block';
+    }else{
+      err.textContent='Incorrect code. Please try again.';
+      input.value='';
+      input.focus();
+    }
+  });
+
+  durGrid.querySelectorAll('.lock-duration-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const opt = DURATION_OPTIONS[parseInt(btn.getAttribute('data-idx'),10)];
+      setLicenseExpiry(opt.ms);
+      hideLockScreen();
+      renderTrialBadge();
+      if(typeof toast==='function') toast(`Unlocked — ${opt.label}`);
+      bootApp();
+    });
+  });
+}
+
+let appBooted = false;
+function bootApp(){
+  if(appBooted) return;
+  appBooted = true;
+  init();
+  setInterval(()=>{
+    renderTrialBadge();
+    if(!isAccessAllowed()){
+      showLockScreen();
+    }
+  }, 30000);
+}
+
+/* ================= Data layer ================= */
+const STORAGE_KEY = 'aureum_crm_v1';
+
+const FIRST_NAMES = ["Aarav","Vivaan","Aditya","Vihaan","Arjun","Sai","Reyansh","Krishna","Ishaan","Kabir","Aryan","Dev","Yash","Rudra","Ananya","Diya","Ira","Myra","Anika","Kavya","Saanvi","Aadhya","Riya","Meera","Tara","Nisha","Pooja","Sneha","Ritika","Isha","Naina","Aisha","Zara","Neel","Karan","Rahul","Amit","Vikas","Manish","Sanjay","Rajesh","Suresh","Anil","Vijay","Ashok","Deepak","Nikhil","Varun","Siddharth","Gaurav","Tarun","Uday","Pranav","Om","Vivek"];
+const LAST_NAMES = ["Sharma","Verma","Gupta","Mehta","Shah","Patel","Kapoor","Malhotra","Chatterjee","Iyer","Rao","Nair","Menon","Reddy","Bhasin","Oberoi","Advani","Khanna","Seth","Nanda","Chopra","Bajaj","Saxena","Trivedi","Joshi","Desai","Bose","Sengupta","Kulkarni","Pillai","Agarwal","Bansal","Chawla","Dutta","Ghosh","Mishra","Pandey","Rastogi","Singhania"];
+const RMS = [
+  {id:"RA", name:"Rohan Advani", role:"Senior Relationship Mgr."},
+  {id:"SK", name:"Simran Kapoor", role:"Relationship Manager"},
+  {id:"AB", name:"Arjun Bhasin", role:"Relationship Manager"},
+  {id:"NT", name:"Nisha Trivedi", role:"Associate RM"}
+];
+
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function initials(name){
+  return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+}
+/* Amount unit formatting — n is always expressed in crore (the app's native
+   storage unit for money). We convert to whichever unit the user has picked
+   in the topbar and format with Indian-style comma grouping. */
+const AMOUNT_UNITS = {
+  crore:    { label:'Cr', factor:1,     decimals:1 },
+  lakh:     { label:'L',  factor:100,   decimals:0 },
+  thousand: { label:'K',  factor:10000, decimals:0 },
+  absolute: { label:'',   factor:1e7,   decimals:0 }
+};
+function formatIndianNumber(num, decimals){
+  const neg = num < 0;
+  num = Math.abs(num);
+  const fixed = decimals>0 ? num.toFixed(decimals) : String(Math.round(num));
+  const [intPart, decPart] = fixed.split('.');
+  let last3 = intPart.slice(-3);
+  let rest = intPart.slice(0,-3);
+  if(rest) rest = rest.replace(/\B(?=(\d{2})+(?!\d)$)/g, ',') + ',';
+  const out = rest + last3;
+  return (neg?'-':'') + out + (decPart!=null ? '.'+decPart : '');
+}
+function currentAmountUnit(){
+  return (typeof DB!=='undefined' && DB && DB.settings && DB.settings.amountUnit) || 'crore';
+}
+function fmtCr(n){
+  const u = AMOUNT_UNITS[currentAmountUnit()] || AMOUNT_UNITS.crore;
+  const val = n * u.factor;
+  return '₹'+formatIndianNumber(val, u.decimals)+(u.label?' '+u.label:'');
+}
+function rmName(id){ const r = RMS.find(r=>r.id===id); return r? r.name : id; }
+
+/* ---------- Contact info generation (seed data only) ---------- */
+function slugifyName(name){
+  return name.toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9\s]/g,'').trim().split(/\s+/).filter(Boolean);
+}
+const EMAIL_DOMAINS = ["gmail.com","outlook.com","yahoo.co.in","icloud.com"];
+function makeEmail(name, rnd){
+  const parts = slugifyName(name);
+  const slug = (parts.slice(0,2).join('.')) || 'client';
+  const domain = EMAIL_DOMAINS[Math.floor(rnd()*EMAIL_DOMAINS.length)];
+  return slug + '@' + domain;
+}
+function makePhone(rnd){
+  const first = 6 + Math.floor(rnd()*4); // Indian mobile numbers start 6-9
+  let rest = '';
+  for(let i=0;i<9;i++) rest += Math.floor(rnd()*10);
+  return '+91 ' + first + rest.slice(0,4) + ' ' + rest.slice(4);
+}
+
+function buildSeedClients(){
+  const rnd = mulberry32(42);
+  const named = [
+    {name:"Vikram Seth Family Office", tier:"private", aum:18.4, rm:"RA", since:2016, lastContactDays:0, status:"active"},
+    {name:"Priya Nanda", tier:"gold", aum:6.2, rm:"RA", since:2019, lastContactDays:0, status:"active"},
+    {name:"R. Iyer Family Trust", tier:"private", aum:22.9, rm:"SK", since:2012, lastContactDays:3, status:"active"},
+    {name:"Ansh Oberoi", tier:"standard", aum:1.8, rm:"RA", since:2021, lastContactDays:47, status:"dormant"},
+    {name:"Devika Malhotra", tier:"gold", aum:4.5, rm:"SK", since:2023, lastContactDays:1, status:"active"},
+    {name:"Nirmal Chatterjee", tier:"gold", aum:5.7, rm:"RA", since:2018, lastContactDays:5, status:"active"},
+    {name:"Kavita Rao", tier:"standard", aum:1.2, rm:"AB", since:2022, lastContactDays:9, status:"active"},
+    {name:"Lakshmi Mehta", tier:"gold", aum:3.9, rm:"NT", since:2020, lastContactDays:14, status:"active"},
+    {name:"Suresh Khanna", tier:"private", aum:15.1, rm:"SK", since:2015, lastContactDays:2, status:"active"},
+    {name:"Arjun Bhasin & Co.", tier:"gold", aum:4.1, rm:"AB", since:2019, lastContactDays:0, status:"active"},
+    {name:"Meera Trivedi", tier:"standard", aum:0.9, rm:"NT", since:2024, lastContactDays:61, status:"dormant"},
+    {name:"Karan Bajaj", tier:"standard", aum:1.4, rm:"AB", since:2023, lastContactDays:52, status:"dormant"}
+  ];
+  const contactRnd = mulberry32(7);
+  const clients = named.map((n,i)=>({
+    id:'c'+(i+1), name:n.name, initials:initials(n.name), tier:n.tier, aum:n.aum,
+    rm:n.rm, since:n.since, lastContactDays:n.lastContactDays, status:n.status, notes:"",
+    email:makeEmail(n.name, contactRnd), phone:makePhone(contactRnd)
+  }));
+  let idx = clients.length;
+  const target = 148;
+  while(clients.length < target){
+    const fn = FIRST_NAMES[Math.floor(rnd()*FIRST_NAMES.length)];
+    const ln = LAST_NAMES[Math.floor(rnd()*LAST_NAMES.length)];
+    const name = fn+' '+ln;
+    const tierRoll = rnd();
+    const tier = tierRoll<0.10 ? 'private' : (tierRoll<0.48 ? 'gold' : 'standard');
+    const aum = tier==='private' ? +(6+rnd()*20).toFixed(1) : tier==='gold' ? +(2+rnd()*6).toFixed(1) : +(0.3+rnd()*2).toFixed(1);
+    const rm = RMS[Math.floor(rnd()*RMS.length)].id;
+    const since = 2010+Math.floor(rnd()*15);
+    const lastContactDays = Math.floor(rnd()*rnd()*95);
+    const status = lastContactDays>40 ? 'dormant' : 'active';
+    idx++;
+    clients.push({id:'c'+idx, name, initials:initials(name), tier, aum, rm, since, lastContactDays, status, notes:"",
+      email:makeEmail(name, contactRnd), phone:makePhone(contactRnd)});
+  }
+  return clients;
+}
+
+function findClientIdByName(clients, name){
+  const c = clients.find(c=>c.name===name);
+  return c ? c.id : null;
+}
+
+function buildSeedPipeline(clients){
+  function deal(name, amt){
+    const id = findClientIdByName(clients, name);
+    return {clientId:id, name, amt};
+  }
+  return {
+    discovery: [deal("Kavita Rao",0.3), deal("Nirmal Chatterjee",0.3), deal("Ansh Oberoi",0.2), deal("Meera Trivedi",0.3)],
+    proposal: [deal("Vikram Seth Family Office",1.1), deal("Lakshmi Mehta",0.5)],
+    negotiation: [deal("Priya Nanda",0.3), deal("R. Iyer Family Trust",0.4), deal("Suresh Khanna",0.2)],
+    closing: [deal("Devika Malhotra",0.35), deal("Arjun Bhasin & Co.",0.25)]
+  };
+}
+
+function buildSeedActivity(){
+  const now = Date.now();
+  const day = 86400000;
+  return [
+    {type:"meeting", text:"<b>Portfolio review</b> completed with Vikram Seth Family Office", ts: now - 2*3600000},
+    {type:"note", text:"Proposal sent to <b>Priya Nanda</b> — Estate Structuring plan", ts: now - 6*3600000},
+    {type:"alert", text:"<b>Ansh Oberoi</b> flagged for renewal follow-up — no contact in 47 days", ts: now - 1*day - 4*3600000},
+    {type:"note", text:"Quarterly statement dispatched to <b>12 Private-tier clients</b>", ts: now - 1*day - 12*3600000},
+    {type:"meeting", text:"Onboarding call scheduled with <b>Devika Malhotra</b>", ts: now - 2*day}
+  ];
+}
+
+function buildSeedDocuments(clients){
+  const day = 86400000;
+  const now = Date.now();
+  return [
+    {name:"Vikram Seth Family Office — Q2 Portfolio Statement.pdf", ts: now-1*day, clientId: findClientIdByName(clients,"Vikram Seth Family Office")},
+    {name:"Priya Nanda — Estate Structuring Proposal.pdf", ts: now-2*day, clientId: findClientIdByName(clients,"Priya Nanda")},
+    {name:"R. Iyer Family Trust — KYC Renewal.pdf", ts: now-5*day, clientId: findClientIdByName(clients,"R. Iyer Family Trust")},
+    {name:"Onboarding Checklist — Devika Malhotra.docx", ts: now-6*day, clientId: findClientIdByName(clients,"Devika Malhotra")}
+  ];
+}
+
+function buildSeedTasks(clients){
+  const day = 86400000;
+  const now = Date.now();
+  function due(offsetDays){ return new Date(now + offsetDays*day).toISOString().slice(0,10); }
+  function task(clientName, title, offsetDays, done){
+    return {id:'t'+Math.random().toString(36).slice(2,9), clientId: findClientIdByName(clients, clientName),
+      title, dueDate: due(offsetDays), done: !!done, createdTs: now - Math.abs(offsetDays)*day};
+  }
+  return [
+    task("Ansh Oberoi", "Call to re-engage — flagged dormant", -3, false),
+    task("Meera Trivedi", "Renewal follow-up call", -1, false),
+    task("R. Iyer Family Trust", "Send KYC renewal reminder", 0, false),
+    task("Vikram Seth Family Office", "Walk through Q2 portfolio statement", 2, false),
+    task("Priya Nanda", "Follow up on Estate Structuring proposal", 4, false),
+    task("Devika Malhotra", "Confirm onboarding paperwork received", 7, false),
+    task("Nirmal Chatterjee", "Quarterly check-in call", -6, true)
+  ];
+}
+
+function seedDB(){
+  const clients = buildSeedClients();
+  return {
+    profile: {name:"Rohan Advani", role:"Senior Relationship Mgr."},
+    clients: clients,
+    pipeline: buildSeedPipeline(clients),
+    activity: buildSeedActivity(),
+    documents: buildSeedDocuments(clients),
+    tasks: buildSeedTasks(clients),
+    dismissedNotifIds: [],
+    settings: { amountUnit: 'crore', theme: 'noir' }
+  };
+}
+
+let DB;
+
+/* Works both inside the Claude.ai artifact runtime (window.storage) and as a
+   plain downloaded HTML file opened in a normal browser (localStorage). */
+function hasCloudStorage(){
+  return typeof window!=='undefined' && window.storage && typeof window.storage.get==='function';
+}
+
+async function loadDB(){
+  try{
+    if(hasCloudStorage()){
+      const res = await window.storage.get(STORAGE_KEY, false);
+      if(res && res.value){ DB = JSON.parse(res.value); migrateDB(); return; }
+    }else{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){ DB = JSON.parse(raw); migrateDB(); return; }
+    }
+  }catch(e){ /* key not found / storage unavailable - fall through to reseed */ }
+  DB = seedDB();
+  saveDB();
+}
+
+/* Fills in fields that didn't exist in older saved copies of DB, so upgrading
+   the app doesn't break on stale localStorage/cloud-storage data. */
+function migrateDB(){
+  if(!DB.settings) DB.settings = { amountUnit: 'crore' };
+  if(!DB.settings.amountUnit) DB.settings.amountUnit = 'crore';
+  if(!DB.settings.theme) DB.settings.theme = 'noir';
+  if(!DB.tasks) DB.tasks = [];
+  if(!DB.documents) DB.documents = [];
+  const contactRnd = mulberry32(11);
+  (DB.clients||[]).forEach(c=>{
+    if(c.email==null) c.email = makeEmail(c.name, contactRnd);
+    if(c.phone==null) c.phone = makePhone(contactRnd);
+  });
+  (DB.documents||[]).forEach(d=>{ if(d.clientId===undefined) d.clientId = null; });
+}
+
+async function saveDB(){
+  try{
+    if(hasCloudStorage()){
+      await window.storage.set(STORAGE_KEY, JSON.stringify(DB), false);
+    }else{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+    }
+  }catch(e){ /* storage unavailable - app still works in-memory for this session */ }
+}
+
+async function clearDB(){
+  try{
+    if(hasCloudStorage()){
+      await window.storage.delete(STORAGE_KEY, false);
+    }else{
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }catch(e){ /* nothing to clear */ }
+}
+
+/* ================= Helpers ================= */
+function totalAUM(){ return DB.clients.reduce((s,c)=>s+c.aum,0); }
+function activeCount(){ return DB.clients.filter(c=>c.status==='active').length; }
+function dormantClients(){ return DB.clients.filter(c=>c.status==='dormant'); }
+function pipelineDeals(){
+  const p = DB.pipeline;
+  return ['discovery','proposal','negotiation','closing'].flatMap(k=>p[k].map(d=>({...d, stage:k})));
+}
+function pipelineCount(){ return pipelineDeals().length; }
+function pipelineTotal(){ return pipelineDeals().reduce((s,d)=>s+d.amt,0); }
+function contactLabel(days){
+  if(days<=0) return 'Today';
+  if(days===1) return 'Yesterday';
+  return days+' days ago';
+}
+function tierLabel(t){ return t==='private'?'Private':t==='gold'?'Gold':'Standard'; }
+function clientById(id){ return DB.clients.find(c=>c.id===id); }
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function logActivity(type, text){
+  DB.activity.unshift({type, text, ts: Date.now()});
+  saveDB();
+}
+
+/* ---------- Tasks / follow-ups ---------- */
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function taskById(id){ return DB.tasks.find(t=>t.id===id); }
+function openTasks(){ return DB.tasks.filter(t=>!t.done); }
+function overdueTasks(){ const t0=todayStr(); return openTasks().filter(t=>t.dueDate < t0); }
+function tasksForClient(clientId){
+  return DB.tasks.filter(t=>t.clientId===clientId).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+}
+function dueDaysDiff(dueDate){
+  const [y,m,d] = dueDate.split('-').map(Number);
+  const due = new Date(y, m-1, d);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((due-today)/86400000);
+}
+function dueBadge(dueDate, done){
+  if(done) return `<span class="due-badge">Completed</span>`;
+  const diff = dueDaysDiff(dueDate);
+  const dateLabel = new Date(dueDate+'T00:00:00').toLocaleDateString([], {day:'numeric', month:'short'});
+  if(diff < 0) return `<span class="due-badge overdue">${Math.abs(diff)}d overdue</span>`;
+  if(diff === 0) return `<span class="due-badge today">Due today</span>`;
+  return `<span class="due-badge">${dateLabel}</span>`;
+}
+function taskRow(t, opts){
+  opts = opts || {};
+  const c = clientById(t.clientId);
+  const titleHtml = c && !opts.hideClient
+    ? `<b>${escapeHtml(c.name)}</b> — ${escapeHtml(t.title)}`
+    : escapeHtml(t.title);
+  return `<div class="task-item ${t.done?'done':''}" data-task-id="${t.id}">
+    <div class="task-check" data-toggle-task="${t.id}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg>
+    </div>
+    <div class="task-body">
+      <div class="task-title">${titleHtml}</div>
+      <div class="task-meta">${dueBadge(t.dueDate, t.done)}</div>
+    </div>
+    <div class="task-del" data-delete-task="${t.id}" title="Delete follow-up">&times;</div>
+  </div>`;
+}
+function bindTaskRowEvents(container){
+  container.querySelectorAll('[data-toggle-task]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      e.stopPropagation();
+      toggleTaskDone(el.getAttribute('data-toggle-task'));
+    });
+  });
+  container.querySelectorAll('[data-delete-task]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      e.stopPropagation();
+      deleteTask(el.getAttribute('data-delete-task'));
+    });
+  });
+}
+function toggleTaskDone(id){
+  const t = taskById(id);
+  if(!t) return;
+  t.done = !t.done;
+  if(t.done){
+    const c = clientById(t.clientId);
+    logActivity('note', `Follow-up completed: <b>${escapeHtml(t.title)}</b>${c?' — '+escapeHtml(c.name):''}`);
+  }
+  saveDB();
+  renderAll();
+}
+function deleteTask(id){
+  DB.tasks = DB.tasks.filter(t=>t.id!==id);
+  saveDB();
+  renderAll();
+  toast('Follow-up removed');
+}
+
+/* ================= Toast ================= */
+function toast(msg){
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 2600);
+}
+
+/* ================= Modal ================= */
+function openModal(html){
+  document.getElementById('modal-box').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.getElementById('modal-box').innerHTML = '';
+}
+
+/* ================= Rendering ================= */
+function renderAll(){
+  renderGreetingAndDate();
+  renderAmountUnitSelect();
+  renderTheme();
+  renderTrialBadge();
+  renderTopStats();
+  renderDashboard();
+  renderClientsView();
+  renderKanban();
+  renderPortfolio();
+  renderTasksView();
+  renderActivityFull();
+  renderDocuments();
+  renderNotifications();
+  renderNavTags();
+  renderProfile();
+}
+
+function renderAmountUnitSelect(){
+  const sel = document.getElementById('amount-unit-select');
+  if(sel) sel.value = currentAmountUnit();
+}
+
+function currentTheme(){
+  return (typeof DB!=='undefined' && DB && DB.settings && DB.settings.theme) || 'noir';
+}
+
+function applyTheme(name){
+  if(!VALID_THEMES.includes(name)) name = 'noir';
+  if(name==='noir'){
+    document.documentElement.removeAttribute('data-theme');
+  }else{
+    document.documentElement.setAttribute('data-theme', name);
+  }
+  DB.settings.theme = name;
+  try{ localStorage.setItem(THEME_CACHE_KEY, name); }catch(e){ /* ignore */ }
+  saveDB();
+  renderTheme();
+}
+
+function renderTheme(){
+  const active = currentTheme();
+  document.querySelectorAll('.theme-swatch').forEach(btn=>{
+    btn.classList.toggle('active', btn.getAttribute('data-theme')===active);
+  });
+}
+
+function renderNavTags(){
+  document.getElementById('nav-tag-clients').textContent = DB.clients.length;
+  document.getElementById('nav-tag-pipeline').textContent = pipelineCount();
+  document.getElementById('nav-tag-tasks').textContent = openTasks().length;
+}
+
+function renderProfile(){
+  document.getElementById('profile-name-label').textContent = DB.profile.name;
+  document.getElementById('profile-role-label').textContent = DB.profile.role;
+  document.getElementById('profile-avatar').textContent = initials(DB.profile.name);
+  document.getElementById('greet-name').textContent = DB.profile.name.split(' ')[0];
+  document.getElementById('settings-name').value = DB.profile.name;
+  document.getElementById('settings-role').value = DB.profile.role;
+}
+
+function renderGreetingAndDate(){
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 5 ? 'Good night' : hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greet-heading').firstChild.textContent = greeting + ', ';
+
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dateStr = `${days[now.getDay()]}, ${String(now.getDate()).padStart(2,'0')} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  const quarter = Math.floor(now.getMonth()/3)+1;
+  const jan1 = new Date(now.getFullYear(),0,1);
+  const week = Math.ceil((((now-jan1)/86400000) + jan1.getDay()+1)/7);
+  document.getElementById('page-date').innerHTML = `${dateStr}<br>Quarter ${quarter} — Week ${week}`;
+}
+
+function renderTopStats(){
+  document.getElementById('stat-active').textContent = activeCount();
+  document.getElementById('stat-new-month').textContent = '6 new this month';
+  document.getElementById('stat-open-opp').innerHTML = fmtCr(pipelineTotal());
+  document.getElementById('stat-pipeline-count').textContent = pipelineCount()+' in pipeline';
+  const risk = dormantClients().length;
+  document.getElementById('stat-risk').textContent = risk;
+}
+
+function stageAvgPct(stageKey){
+  const map = {discovery:35, proposal:55, negotiation:70, closing:90};
+  return map[stageKey] || 50;
+}
+function stageDisplayName(k){
+  return {discovery:"Discovery", proposal:"Proposal Sent", negotiation:"Negotiation", closing:"Closing"}[k];
+}
+
+function renderDashboard(){
+  // Pipeline mini panel
+  const el = document.getElementById('dash-pipeline');
+  el.innerHTML = ['discovery','proposal','negotiation','closing'].map(k=>{
+    const deals = DB.pipeline[k];
+    const amt = deals.reduce((s,d)=>s+d.amt,0);
+    const chips = deals.slice(0,3).map(d=>`<span class="chip">${escapeHtml(d.name)}</span>`).join('');
+    const more = deals.length>3 ? `<span class="chip">+${deals.length-3}</span>` : '';
+    return `<div class="stage">
+      <div class="stage-top">
+        <div class="stage-name">${stageDisplayName(k)}</div>
+        <div class="stage-meta"><b>${deals.length}</b> · ${fmtCr(amt)}</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${stageAvgPct(k)}%"></div></div>
+      <div class="stage-clients">${chips}${more}</div>
+    </div>`;
+  }).join('');
+
+  // Activity mini panel (latest 5)
+  const act = document.getElementById('dash-activity');
+  act.innerHTML = DB.activity.slice(0,5).map(a=>activityRow(a)).join('');
+
+  // Ledger preview (6 rows, most recently contacted first)
+  const sorted = [...DB.clients].sort((a,b)=>a.lastContactDays-b.lastContactDays).slice(0,6);
+  document.getElementById('dash-ledger-body').innerHTML = sorted.map(c=>clientRow(c)).join('');
+  document.getElementById('dash-ledger-count').textContent = `Showing 6 of ${DB.clients.length} relationships`;
+
+  bindClientRowClicks(document.getElementById('dash-ledger-body'));
+
+  // Upcoming follow-ups (open tasks, nearest due date first)
+  const dashTasks = document.getElementById('dash-tasks');
+  const upcoming = [...openTasks()].sort((a,b)=>a.dueDate.localeCompare(b.dueDate)).slice(0,5);
+  dashTasks.innerHTML = upcoming.length
+    ? upcoming.map(t=>taskRow(t)).join('')
+    : `<div class="task-empty">No open follow-ups — you're all caught up.</div>`;
+  bindTaskRowEvents(dashTasks);
+}
+
+function timeAgoLabel(ts){
+  const diff = Date.now()-ts;
+  const day = 86400000;
+  if(diff < day){
+    const d = new Date(ts);
+    return 'TODAY · '+d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  }
+  if(diff < 2*day) return 'YESTERDAY';
+  return Math.floor(diff/day)+' DAYS AGO';
+}
+function activityRow(a){
+  const dotClass = a.type==='meeting' ? 'meeting' : a.type==='alert' ? 'alert' : '';
+  return `<div class="a-item">
+    <div class="a-dot ${dotClass}"></div>
+    <div>
+      <div class="a-text">${a.text}</div>
+      <span class="a-time">${timeAgoLabel(a.ts)}</span>
+    </div>
+  </div>`;
+}
+function renderActivityFull(){
+  document.getElementById('activity-full').innerHTML = DB.activity.map(a=>activityRow(a)).join('');
+}
+
+function clientRow(c){
+  const tierClass = c.tier;
+  return `<tr class="clickable" data-id="${c.id}">
+    <td><div class="client-cell"><div class="client-avatar">${c.initials}</div><div><div class="client-name">${escapeHtml(c.name)}</div><div class="client-sub">Client since ${c.since}</div></div></div></td>
+    <td><span class="tier ${tierClass}">${tierLabel(c.tier)}</span></td>
+    <td class="num">${fmtCr(c.aum)}</td>
+    <td><div class="rm-cell"><div class="rm-dot">${c.rm}</div>${rmName(c.rm)}</div></td>
+    <td class="num">${contactLabel(c.lastContactDays)}</td>
+    <td><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></td>
+  </tr>`;
+}
+function bindClientRowClicks(container){
+  container.querySelectorAll('tr[data-id]').forEach(tr=>{
+    tr.addEventListener('click', ()=>openClientDetail(tr.getAttribute('data-id')));
+  });
+}
+
+/* Row variant used on the full Clients ledger — adds a leading checkbox so
+   several clients can be selected at once for bulk delete. Clicking the
+   checkbox (or its cell) selects the row instead of opening the detail modal. */
+function clientRowSelectable(c){
+  const tierClass = c.tier;
+  const checked = clientsState.selected.has(c.id) ? 'checked' : '';
+  return `<tr class="clickable" data-id="${c.id}">
+    <td class="checkbox-cell"><input type="checkbox" class="row-select" data-id="${c.id}" ${checked}></td>
+    <td><div class="client-cell"><div class="client-avatar">${c.initials}</div><div><div class="client-name">${escapeHtml(c.name)}</div><div class="client-sub">Client since ${c.since}</div></div></div></td>
+    <td><span class="tier ${tierClass}">${tierLabel(c.tier)}</span></td>
+    <td class="num">${fmtCr(c.aum)}</td>
+    <td><div class="rm-cell"><div class="rm-dot">${c.rm}</div>${rmName(c.rm)}</div></td>
+    <td class="num">${contactLabel(c.lastContactDays)}</td>
+    <td><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></td>
+  </tr>`;
+}
+
+function updateBulkBar(){
+  const bar = document.getElementById('clients-bulk-bar');
+  const count = clientsState.selected.size;
+  bar.classList.toggle('open', count>0);
+  document.getElementById('clients-selected-count').textContent = count;
+  const selectAll = document.getElementById('clients-select-all');
+  if(selectAll){
+    const idsOnPage = Array.from(document.querySelectorAll('#clients-body input.row-select')).map(cb=>cb.getAttribute('data-id'));
+    const allChecked = idsOnPage.length>0 && idsOnPage.every(id=>clientsState.selected.has(id));
+    selectAll.checked = allChecked;
+    selectAll.indeterminate = !allChecked && idsOnPage.some(id=>clientsState.selected.has(id));
+  }
+}
+
+function bindClientSelectionEvents(container){
+  container.querySelectorAll('input.row-select').forEach(cb=>{
+    cb.addEventListener('click', e=>e.stopPropagation());
+    cb.addEventListener('change', e=>{
+      const id = e.target.getAttribute('data-id');
+      if(e.target.checked) clientsState.selected.add(id);
+      else clientsState.selected.delete(id);
+      updateBulkBar();
+    });
+  });
+  container.querySelectorAll('td.checkbox-cell').forEach(td=>{
+    td.addEventListener('click', e=>e.stopPropagation());
+  });
+}
+
+function deleteClients(ids){
+  const idSet = new Set(ids);
+  const removed = DB.clients.filter(c=>idSet.has(c.id));
+  DB.clients = DB.clients.filter(c=>!idSet.has(c.id));
+  // Clean up references to the deleted clients so the pipeline/kanban doesn't
+  // point at ledger entries that no longer exist.
+  ['discovery','proposal','negotiation','closing'].forEach(stage=>{
+    DB.pipeline[stage] = DB.pipeline[stage].filter(d=>!idSet.has(d.clientId));
+  });
+  ids.forEach(id=>clientsState.selected.delete(id));
+  if(removed.length===1){
+    logActivity('note', `Client record deleted: <b>${escapeHtml(removed[0].name)}</b>`);
+  }else if(removed.length>1){
+    logActivity('note', `${removed.length} client records deleted`);
+  }
+  saveDB();
+  renderAll();
+  toast(removed.length===1 ? 'Deleted '+removed[0].name : `Deleted ${removed.length} clients`);
+}
+
+/* ---------- Clients view (search / filter / sort / paginate) ---------- */
+const clientsState = { query:'', tier:'', sort:'name', page:1, perPage:12, selected:new Set() };
+
+function filteredSortedClients(){
+  let list = DB.clients.filter(c=>{
+    if(clientsState.tier && c.tier !== clientsState.tier) return false;
+    if(clientsState.query && !c.name.toLowerCase().includes(clientsState.query.toLowerCase())) return false;
+    return true;
+  });
+  switch(clientsState.sort){
+    case 'aum-desc': list.sort((a,b)=>b.aum-a.aum); break;
+    case 'aum-asc': list.sort((a,b)=>a.aum-b.aum); break;
+    case 'contact': list.sort((a,b)=>a.lastContactDays-b.lastContactDays); break;
+    default: list.sort((a,b)=>a.name.localeCompare(b.name));
+  }
+  return list;
+}
+
+function renderClientsView(){
+  const list = filteredSortedClients();
+  const totalPages = Math.max(1, Math.ceil(list.length/clientsState.perPage));
+  if(clientsState.page > totalPages) clientsState.page = totalPages;
+  const start = (clientsState.page-1)*clientsState.perPage;
+  const pageItems = list.slice(start, start+clientsState.perPage);
+
+  document.getElementById('clients-body').innerHTML = pageItems.map(c=>clientRowSelectable(c)).join('') ||
+    `<tr><td colspan="7" style="padding:24px 22px;color:var(--ivory-faint);">No clients match your filters.</td></tr>`;
+  bindClientRowClicks(document.getElementById('clients-body'));
+  bindClientSelectionEvents(document.getElementById('clients-body'));
+  updateBulkBar();
+
+  document.getElementById('clients-count').textContent =
+    `Showing ${pageItems.length ? start+1 : 0}–${start+pageItems.length} of ${list.length} relationships`;
+
+  const pager = document.getElementById('clients-pager');
+  pager.innerHTML = `
+    <button id="cp-prev" ${clientsState.page<=1?'disabled':''}>Prev</button>
+    <span>Page ${clientsState.page} of ${totalPages}</span>
+    <button id="cp-next" ${clientsState.page>=totalPages?'disabled':''}>Next</button>
+  `;
+  const prevBtn = document.getElementById('cp-prev');
+  const nextBtn = document.getElementById('cp-next');
+  if(prevBtn) prevBtn.addEventListener('click', ()=>{ clientsState.page--; renderClientsView(); });
+  if(nextBtn) nextBtn.addEventListener('click', ()=>{ clientsState.page++; renderClientsView(); });
+}
+
+/* ---------- Pipeline / Kanban ---------- */
+function renderKanban(){
+  const board = document.getElementById('kanban-board');
+  const stages = ['discovery','proposal','negotiation','closing'];
+  board.innerHTML = stages.map(k=>{
+    const deals = DB.pipeline[k];
+    const amt = deals.reduce((s,d)=>s+d.amt,0);
+    const cards = deals.map((d,i)=>`
+      <div class="kan-card" draggable="true" data-stage="${k}" data-index="${i}">
+        <div class="kc-name">${escapeHtml(d.name)}</div>
+        <div class="kc-amt">${fmtCr(d.amt)}</div>
+      </div>`).join('') || `<div class="kan-empty">No deals in this stage</div>`;
+    return `<div class="kan-col" data-stage="${k}">
+      <div class="kan-head">
+        <div class="kan-title">${stageDisplayName(k)}</div>
+        <div class="kan-meta">${deals.length} · ${fmtCr(amt)}</div>
+      </div>
+      <div class="kan-body" data-stage="${k}">${cards}</div>
+    </div>`;
+  }).join('');
+
+  // drag and drop
+  let dragData = null;
+  board.querySelectorAll('.kan-card').forEach(card=>{
+    card.addEventListener('dragstart', e=>{
+      dragData = {stage:card.getAttribute('data-stage'), index:+card.getAttribute('data-index')};
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragend', ()=>{ card.classList.remove('dragging'); });
+    card.addEventListener('click', ()=>{
+      const stage = card.getAttribute('data-stage');
+      const index = +card.getAttribute('data-index');
+      const deal = DB.pipeline[stage][index];
+      if(deal.clientId) openClientDetail(deal.clientId);
+    });
+  });
+  board.querySelectorAll('.kan-col').forEach(col=>{
+    col.addEventListener('dragover', e=>{ e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', ()=>col.classList.remove('drag-over'));
+    col.addEventListener('drop', e=>{
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      if(!dragData) return;
+      const targetStage = col.getAttribute('data-stage');
+      if(targetStage === dragData.stage) return;
+      const [moved] = DB.pipeline[dragData.stage].splice(dragData.index,1);
+      DB.pipeline[targetStage].push(moved);
+      logActivity('note', `<b>${escapeHtml(moved.name)}</b> moved to <b>${stageDisplayName(targetStage)}</b>`);
+      saveDB();
+      renderAll();
+      toast(`Moved ${moved.name} to ${stageDisplayName(targetStage)}`);
+    });
+  });
+}
+
+/* ---------- Portfolio ---------- */
+function renderPortfolio(){
+  const total = totalAUM();
+  const byTier = {private:0, gold:0, standard:0};
+  DB.clients.forEach(c=>byTier[c.tier]+=c.aum);
+  const tierEl = document.getElementById('portfolio-tier');
+  tierEl.innerHTML = Object.keys(byTier).map(t=>{
+    const pct = total ? Math.round(byTier[t]/total*100) : 0;
+    return `<div class="pf-row">
+      <div class="stage-top"><div class="stage-name">${tierLabel(t)}</div><div class="stage-meta"><b>${pct}%</b> · ${fmtCr(byTier[t])}</div></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  const byRM = {};
+  RMS.forEach(r=>byRM[r.id]=0);
+  DB.clients.forEach(c=>{ byRM[c.rm] = (byRM[c.rm]||0)+c.aum; });
+  const rmEl = document.getElementById('portfolio-rm');
+  rmEl.innerHTML = RMS.map(r=>{
+    const val = byRM[r.id]||0;
+    const pct = total ? Math.round(val/total*100) : 0;
+    return `<div class="pf-row">
+      <div class="stage-top"><div class="stage-name">${r.name}</div><div class="stage-meta"><b>${pct}%</b> · ${fmtCr(val)}</div></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- Tasks view ---------- */
+function renderTasksView(){
+  const el = document.getElementById('tasks-list');
+  if(!el) return;
+  const all = [...DB.tasks];
+  const t0 = todayStr();
+  const overdue = all.filter(t=>!t.done && t.dueDate < t0).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+  const today = all.filter(t=>!t.done && t.dueDate === t0);
+  const upcoming = all.filter(t=>!t.done && t.dueDate > t0).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+  const completed = all.filter(t=>t.done).sort((a,b)=>b.dueDate.localeCompare(a.dueDate));
+
+  function group(label, items){
+    if(!items.length) return '';
+    return `<div class="task-group-label">${label} (${items.length})</div>` + items.map(t=>taskRow(t)).join('');
+  }
+
+  const html = group('Overdue', overdue) + group('Due Today', today) + group('Upcoming', upcoming) + group('Completed', completed);
+  el.innerHTML = html || `<div class="task-empty">No follow-ups yet. Add one to keep a client relationship on track.</div>`;
+  bindTaskRowEvents(el);
+}
+
+/* ---------- Add follow-up modal ---------- */
+function openAddTaskModal(prefillClientId){
+  const clientOptions = DB.clients.slice(0,500).map(c=>`<option value="${c.id}" ${c.id===prefillClientId?'selected':''}>${escapeHtml(c.name)}</option>`).join('');
+  const defaultDue = new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+  const html = `
+    <div class="modal-head">
+      <div class="modal-title">Add Follow-up</div>
+      <div class="modal-close" id="modal-close">&times;</div>
+    </div>
+    <div class="modal-body">
+      <form id="new-task-form" class="form-grid">
+        <label>Client<select id="nt-client">${clientOptions}</select></label>
+        <label>What needs to happen<input type="text" id="nt-title" required placeholder="e.g. Call to review portfolio"></label>
+        <label>Due date<input type="date" id="nt-due" required value="${defaultDue}"></label>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Add follow-up</button>
+          <button type="button" class="btn btn-ghost" id="nt-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  `;
+  openModal(html);
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('nt-cancel').addEventListener('click', closeModal);
+  document.getElementById('new-task-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    const clientId = document.getElementById('nt-client').value;
+    const title = document.getElementById('nt-title').value.trim();
+    const dueDate = document.getElementById('nt-due').value;
+    if(!title || !dueDate) return;
+    const c = clientById(clientId);
+    DB.tasks.push({id:'t'+Math.random().toString(36).slice(2,9), clientId, title, dueDate, done:false, createdTs:Date.now()});
+    logActivity('note', `Follow-up scheduled${c?' for <b>'+escapeHtml(c.name)+'</b>':''}: ${escapeHtml(title)}`);
+    saveDB();
+    renderAll();
+    closeModal();
+    toast('Follow-up added');
+  });
+}
+
+/* ---------- Documents ---------- */
+function fmtBytes(n){
+  if(n==null) return '';
+  if(n < 1024) return n+' B';
+  if(n < 1024*1024) return (n/1024).toFixed(1)+' KB';
+  return (n/(1024*1024)).toFixed(1)+' MB';
+}
+function renderDocuments(){
+  const el = document.getElementById('documents-list');
+  el.innerHTML = DB.documents.map((d,i)=>{
+    const c = d.clientId ? clientById(d.clientId) : null;
+    const clientLabel = c ? ` · <b>${escapeHtml(c.name)}</b>` : '';
+    return `
+    <div class="a-item" data-doc-idx="${i}">
+      <div class="a-dot"></div>
+      <div>
+        <div class="a-text"><b>${escapeHtml(d.name)}</b>
+          <small>${d.size!=null ? fmtBytes(d.size)+' · ' : ''}${d.dataUrl ? 'Click to open' : 'Preview unavailable (seed document)'}${clientLabel}</small>
+        </div>
+        <span class="a-time">${timeAgoLabel(d.ts)}</span>
+      </div>
+    </div>`;
+  }).join('') || `<div class="notif-empty">No documents yet.</div>`;
+
+  el.querySelectorAll('.a-item[data-doc-idx]').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const doc = DB.documents[parseInt(row.getAttribute('data-doc-idx'),10)];
+      openDocument(doc);
+    });
+  });
+
+  const uploadSelect = document.getElementById('doc-upload-client');
+  if(uploadSelect){
+    const currentVal = uploadSelect.value;
+    uploadSelect.innerHTML = '<option value="">No client (general)</option>' +
+      DB.clients.slice(0,500).map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+    uploadSelect.value = currentVal;
+  }
+}
+function openDocument(doc){
+  if(!doc || !doc.dataUrl){
+    toast('No stored content for this document — it predates upload or was too large to save');
+    return;
+  }
+  // Trigger a real download/open of the stored file content
+  const a = document.createElement('a');
+  a.href = doc.dataUrl;
+  a.download = doc.name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+/* ---------- Notifications ---------- */
+function notificationSource(){
+  const items = [];
+  overdueTasks().forEach(t=>{
+    const id = 'task-'+t.id;
+    if(DB.dismissedNotifIds.includes(id)) return;
+    const c = clientById(t.clientId);
+    items.push({id, type:'alert', text:`Follow-up overdue${c?' for <b>'+escapeHtml(c.name)+'</b>':''}: ${escapeHtml(t.title)}`});
+  });
+  dormantClients().forEach(c=>{
+    const id = 'dormant-'+c.id;
+    if(DB.dismissedNotifIds.includes(id)) return;
+    items.push({id, type:'alert', text:`<b>${escapeHtml(c.name)}</b> flagged for renewal follow-up — no contact in ${c.lastContactDays} days`});
+  });
+  DB.activity.slice(0,3).forEach((a,i)=>{
+    const id = 'act-'+i+'-'+a.ts;
+    if(DB.dismissedNotifIds.includes(id)) return;
+    items.push({id, type:a.type, text:a.text});
+  });
+  return items;
+}
+function renderNotifications(){
+  const items = notificationSource();
+  document.getElementById('notif-dot').style.display = items.length ? 'block' : 'none';
+  const list = document.getElementById('notif-list');
+  list.innerHTML = items.length ? items.map(n=>`
+    <div class="notif-row" data-id="${n.id}">
+      <div class="a-dot ${n.type==='meeting'?'meeting':n.type==='alert'?'alert':''}"></div>
+      <div class="a-text">${n.text}</div>
+    </div>`).join('') : `<div class="notif-empty">You're all caught up.</div>`;
+  list.querySelectorAll('.notif-row').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const id = row.getAttribute('data-id');
+      if(!DB.dismissedNotifIds.includes(id)) DB.dismissedNotifIds.push(id);
+      saveDB();
+      renderNotifications();
+    });
+  });
+}
+
+/* ================= Client detail modal ================= */
+function openClientDetail(id){
+  const c = clientById(id);
+  if(!c) return;
+  const html = `
+    <div class="modal-head">
+      <div class="modal-title">Client Profile</div>
+      <div class="modal-head-actions">
+        <button type="button" class="btn btn-ghost" id="edit-client-btn">Edit</button>
+        <div class="modal-close" id="modal-close">&times;</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="detail-head">
+        <div class="detail-avatar">${c.initials}</div>
+        <div>
+          <div style="font-family:'Fraunces',serif;font-size:19px;">${escapeHtml(c.name)}</div>
+          <div style="color:var(--ivory-faint);font-size:12px;">Client since ${c.since}</div>
+        </div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="dl">Tier</div><div class="dv"><span class="tier ${c.tier}">${tierLabel(c.tier)}</span></div></div>
+        <div class="detail-item"><div class="dl">AUM</div><div class="dv num">${fmtCr(c.aum)}</div></div>
+        <div class="detail-item"><div class="dl">Relationship Manager</div><div class="dv">${rmName(c.rm)}</div></div>
+        <div class="detail-item"><div class="dl">Last Contact</div><div class="dv">${contactLabel(c.lastContactDays)}</div></div>
+        <div class="detail-item"><div class="dl">Status</div><div class="dv"><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></div></div>
+        <div class="detail-item"><div class="dl">Email</div><div class="dv">${c.email ? `<a href="mailto:${escapeHtml(c.email)}" style="color:inherit;">${escapeHtml(c.email)}</a>` : '—'}</div></div>
+        <div class="detail-item"><div class="dl">Phone</div><div class="dv">${c.phone ? `<a href="tel:${escapeHtml(c.phone)}" style="color:inherit;">${escapeHtml(c.phone)}</a>` : '—'}</div></div>
+      </div>
+      <div class="detail-notes">
+        <div class="dl" style="margin-bottom:8px;">Notes</div>
+        <textarea id="client-notes">${escapeHtml(c.notes||'')}</textarea>
+        <div class="form-actions" style="margin-top:12px;">
+          <button class="btn btn-primary" id="save-notes-btn">Save notes</button>
+          <button class="btn btn-ghost" id="log-contact-btn">Log contact today</button>
+          <button class="btn btn-danger-ghost" id="delete-client-btn" style="margin-left:auto;">Delete client</button>
+        </div>
+      </div>
+      <div class="mini-list">
+        <div class="detail-subhead">
+          <div class="dl">Follow-ups</div>
+          <button type="button" class="link-btn" id="detail-add-task-btn">+ Add follow-up</button>
+        </div>
+        <div id="detail-tasks-list"></div>
+      </div>
+      <div class="mini-list">
+        <div class="detail-subhead"><div class="dl">Documents</div></div>
+        <div id="detail-docs-list"></div>
+      </div>
+    </div>
+  `;
+  openModal(html);
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('edit-client-btn').addEventListener('click', ()=>{
+    openEditClientModal(c.id);
+  });
+  document.getElementById('save-notes-btn').addEventListener('click', ()=>{
+    c.notes = document.getElementById('client-notes').value;
+    saveDB();
+    toast('Notes saved');
+  });
+  document.getElementById('log-contact-btn').addEventListener('click', ()=>{
+    c.lastContactDays = 0;
+    c.status = 'active';
+    logActivity('note', `Contact logged with <b>${escapeHtml(c.name)}</b>`);
+    saveDB();
+    renderAll();
+    toast('Contact logged for '+c.name);
+    closeModal();
+  });
+  document.getElementById('delete-client-btn').addEventListener('click', ()=>{
+    if(confirm(`Delete ${c.name} from the client ledger? This cannot be undone.`)){
+      closeModal();
+      deleteClients([c.id]);
+    }
+  });
+
+  // Follow-ups scoped to this client
+  const detailTasks = document.getElementById('detail-tasks-list');
+  const cTasks = tasksForClient(c.id);
+  detailTasks.innerHTML = cTasks.length
+    ? cTasks.map(t=>taskRow(t, {hideClient:true})).join('')
+    : `<div class="mini-list-empty">No follow-ups scheduled.</div>`;
+  bindTaskRowEvents(detailTasks);
+  detailTasks.querySelectorAll('[data-toggle-task],[data-delete-task]').forEach(el=>{
+    el.addEventListener('click', ()=>{ openClientDetail(c.id); });
+  });
+  document.getElementById('detail-add-task-btn').addEventListener('click', ()=>{
+    openAddTaskModal(c.id);
+  });
+
+  // Documents linked to this client
+  const detailDocs = document.getElementById('detail-docs-list');
+  const cDocs = DB.documents.filter(d=>d.clientId===c.id);
+  detailDocs.innerHTML = cDocs.length
+    ? cDocs.map((d,i)=>`<div class="mini-list-item"><span>${escapeHtml(d.name)}</span><button type="button" class="link-btn" data-open-doc="${DB.documents.indexOf(d)}">${d.dataUrl?'Open':'—'}</button></div>`).join('')
+    : `<div class="mini-list-empty">No documents linked to this client.</div>`;
+  detailDocs.querySelectorAll('[data-open-doc]').forEach(btn=>{
+    btn.addEventListener('click', ()=>openDocument(DB.documents[parseInt(btn.getAttribute('data-open-doc'),10)]));
+  });
+}
+
+/* ================= Edit client modal ================= */
+function openEditClientModal(id){
+  const c = clientById(id);
+  if(!c) return;
+  const rmOptions = RMS.map(r=>`<option value="${r.id}" ${r.id===c.rm?'selected':''}>${r.name}</option>`).join('');
+  const html = `
+    <div class="modal-head">
+      <div class="modal-title">Edit Client</div>
+      <div class="modal-close" id="modal-close">&times;</div>
+    </div>
+    <div class="modal-body">
+      <form id="edit-client-form" class="form-grid">
+        <label>Client name<input type="text" id="ec-name" required value="${escapeHtml(c.name)}"></label>
+        <label>Email<input type="email" id="ec-email" value="${escapeHtml(c.email||'')}" placeholder="client@example.com"></label>
+        <label>Phone<input type="tel" id="ec-phone" value="${escapeHtml(c.phone||'')}" placeholder="+91 98765 43210"></label>
+        <label>Tier
+          <select id="ec-tier">
+            <option value="standard" ${c.tier==='standard'?'selected':''}>Standard</option>
+            <option value="gold" ${c.tier==='gold'?'selected':''}>Gold</option>
+            <option value="private" ${c.tier==='private'?'selected':''}>Private</option>
+          </select>
+        </label>
+        <label>AUM (₹ Cr)<input type="number" id="ec-aum" min="0" step="0.1" required value="${c.aum}"></label>
+        <label>Relationship Manager<select id="ec-rm">${rmOptions}</select></label>
+        <label>Status
+          <select id="ec-status">
+            <option value="active" ${c.status==='active'?'selected':''}>Active</option>
+            <option value="dormant" ${c.status==='dormant'?'selected':''}>Dormant</option>
+          </select>
+        </label>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-ghost" id="ec-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  `;
+  openModal(html);
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('ec-cancel').addEventListener('click', ()=>openClientDetail(id));
+  document.getElementById('edit-client-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    const name = document.getElementById('ec-name').value.trim();
+    if(!name) return;
+    c.name = name;
+    c.initials = initials(name);
+    c.email = document.getElementById('ec-email').value.trim();
+    c.phone = document.getElementById('ec-phone').value.trim();
+    c.tier = document.getElementById('ec-tier').value;
+    c.aum = parseFloat(document.getElementById('ec-aum').value) || 0;
+    c.rm = document.getElementById('ec-rm').value;
+    c.status = document.getElementById('ec-status').value;
+    logActivity('note', `Client details updated for <b>${escapeHtml(c.name)}</b>`);
+    saveDB();
+    renderAll();
+    toast('Client updated: '+c.name);
+    closeModal();
+  });
+}
+
+/* ================= New client modal ================= */
+function openNewClientModal(){
+  const rmOptions = RMS.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  const html = `
+    <div class="modal-head">
+      <div class="modal-title">New Client</div>
+      <div class="modal-close" id="modal-close">&times;</div>
+    </div>
+    <div class="modal-body">
+      <form id="new-client-form" class="form-grid">
+        <label>Client name<input type="text" id="nc-name" required placeholder="e.g. Ramesh Kulkarni"></label>
+        <label>Email<input type="email" id="nc-email" placeholder="client@example.com"></label>
+        <label>Phone<input type="tel" id="nc-phone" placeholder="+91 98765 43210"></label>
+        <label>Tier
+          <select id="nc-tier">
+            <option value="standard">Standard</option>
+            <option value="gold">Gold</option>
+            <option value="private">Private</option>
+          </select>
+        </label>
+        <label>AUM (₹ Cr)<input type="number" id="nc-aum" min="0" step="0.1" required placeholder="e.g. 2.5"></label>
+        <label>Relationship Manager<select id="nc-rm">${rmOptions}</select></label>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Add client</button>
+          <button type="button" class="btn btn-ghost" id="nc-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  `;
+  openModal(html);
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('nc-cancel').addEventListener('click', closeModal);
+  document.getElementById('new-client-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    const name = document.getElementById('nc-name').value.trim();
+    const email = document.getElementById('nc-email').value.trim();
+    const phone = document.getElementById('nc-phone').value.trim();
+    const tier = document.getElementById('nc-tier').value;
+    const aum = parseFloat(document.getElementById('nc-aum').value) || 0;
+    const rm = document.getElementById('nc-rm').value;
+    if(!name) return;
+    const id = 'c'+(DB.clients.length+1)+'-'+Date.now();
+    DB.clients.unshift({id, name, initials:initials(name), tier, aum, rm, since:new Date().getFullYear(), lastContactDays:0, status:'active', notes:'', email, phone});
+    logActivity('meeting', `<b>${escapeHtml(name)}</b> onboarded as a new ${tierLabel(tier)}-tier client`);
+    saveDB();
+    renderAll();
+    closeModal();
+    toast('New client added: '+name);
+  });
+}
+
+/* ================= Add deal modal ================= */
+function openAddDealModal(){
+  const clientOptions = DB.clients.slice(0,300).map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+  const html = `
+    <div class="modal-head">
+      <div class="modal-title">Add Deal</div>
+      <div class="modal-close" id="modal-close">&times;</div>
+    </div>
+    <div class="modal-body">
+      <form id="new-deal-form" class="form-grid">
+        <label>Client<select id="nd-client">${clientOptions}</select></label>
+        <label>Deal size (₹ Cr)<input type="number" id="nd-amt" min="0" step="0.1" required placeholder="e.g. 1.2"></label>
+        <label>Stage
+          <select id="nd-stage">
+            <option value="discovery">Discovery</option>
+            <option value="proposal">Proposal Sent</option>
+            <option value="negotiation">Negotiation</option>
+            <option value="closing">Closing</option>
+          </select>
+        </label>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Add deal</button>
+          <button type="button" class="btn btn-ghost" id="nd-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  `;
+  openModal(html);
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('nd-cancel').addEventListener('click', closeModal);
+  document.getElementById('new-deal-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    const clientId = document.getElementById('nd-client').value;
+    const amt = parseFloat(document.getElementById('nd-amt').value) || 0;
+    const stage = document.getElementById('nd-stage').value;
+    const c = clientById(clientId);
+    if(!c) return;
+    DB.pipeline[stage].push({clientId, name:c.name, amt});
+    logActivity('note', `New deal opened with <b>${escapeHtml(c.name)}</b> in ${stageDisplayName(stage)}`);
+    saveDB();
+    renderAll();
+    closeModal();
+    toast('Deal added for '+c.name);
+  });
+}
+
+/* ================= CSV export ================= */
+function exportCSV(){
+  const list = filteredSortedClients();
+  const rows = [['Client','Email','Phone','Tier','AUM (Cr)','Relationship Manager','Last Contact (days)','Status']];
+  list.forEach(c=>rows.push([c.name, c.email||'', c.phone||'', tierLabel(c.tier), c.aum, rmName(c.rm), c.lastContactDays, c.status]));
+  const csv = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'aureum-client-ledger.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('Exported '+list.length+' relationships to CSV');
+}
+
+/* ================= Navigation ================= */
+function gotoView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const target = document.getElementById('view-'+name);
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.nav-item[data-view]').forEach(i=>{
+    i.classList.toggle('active', i.getAttribute('data-view')===name);
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ================= Wire up events ================= */
+function closeMobileSidebar(){
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-scrim').classList.remove('open');
+}
+
+function wireEvents(){
+  const menuBtn = document.getElementById('menu-btn');
+  const sidebar = document.querySelector('.sidebar');
+  const scrim = document.getElementById('sidebar-scrim');
+  menuBtn.addEventListener('click', e=>{
+    e.stopPropagation();
+    sidebar.classList.add('open');
+    scrim.classList.add('open');
+  });
+  scrim.addEventListener('click', closeMobileSidebar);
+
+  document.querySelectorAll('.nav-item[data-view]').forEach(item=>{
+    item.addEventListener('click', ()=>{ gotoView(item.getAttribute('data-view')); closeMobileSidebar(); });
+  });
+  document.querySelectorAll('[data-goto]').forEach(el=>{
+    el.addEventListener('click', ()=>gotoView(el.getAttribute('data-goto')));
+  });
+
+  // Global search -> jumps to clients view and filters
+  const globalSearch = document.getElementById('global-search');
+  globalSearch.addEventListener('input', ()=>{
+    clientsState.query = globalSearch.value;
+    clientsState.page = 1;
+    document.getElementById('clients-search').value = globalSearch.value;
+    renderClientsView();
+    if(globalSearch.value.trim()) gotoView('clients');
+  });
+
+  // Clients view controls
+  document.getElementById('clients-search').addEventListener('input', e=>{
+    clientsState.query = e.target.value;
+    clientsState.page = 1;
+    renderClientsView();
+  });
+  document.getElementById('clients-tier-filter').addEventListener('change', e=>{
+    clientsState.tier = e.target.value;
+    clientsState.page = 1;
+    renderClientsView();
+  });
+  document.getElementById('clients-sort').addEventListener('change', e=>{
+    clientsState.sort = e.target.value;
+    renderClientsView();
+  });
+
+  // Select-all (current page) checkbox
+  document.getElementById('clients-select-all').addEventListener('change', e=>{
+    const idsOnPage = Array.from(document.querySelectorAll('#clients-body input.row-select')).map(cb=>cb.getAttribute('data-id'));
+    if(e.target.checked) idsOnPage.forEach(id=>clientsState.selected.add(id));
+    else idsOnPage.forEach(id=>clientsState.selected.delete(id));
+    renderClientsView();
+  });
+
+  // Bulk actions bar
+  document.getElementById('clients-clear-selection-btn').addEventListener('click', ()=>{
+    clientsState.selected.clear();
+    renderClientsView();
+  });
+  document.getElementById('clients-bulk-delete-btn').addEventListener('click', ()=>{
+    const ids = Array.from(clientsState.selected);
+    if(!ids.length) return;
+    if(confirm(`Delete ${ids.length} selected client${ids.length>1?'s':''}? This cannot be undone.`)){
+      deleteClients(ids);
+    }
+  });
+
+  // Amount unit selector — reformats every money figure across the app
+  document.getElementById('amount-unit-select').addEventListener('change', e=>{
+    DB.settings.amountUnit = e.target.value;
+    saveDB();
+    renderAll();
+    animateAUM();
+  });
+
+  // New client / add deal
+  document.getElementById('new-client-btn').addEventListener('click', openNewClientModal);
+  document.getElementById('add-deal-btn').addEventListener('click', openAddDealModal);
+  document.getElementById('add-task-btn').addEventListener('click', ()=>openAddTaskModal());
+
+  // Export
+  document.getElementById('export-btn').addEventListener('click', exportCSV);
+
+  // Document upload — actually reads and stores the file so it can be reopened later
+  document.getElementById('doc-upload').addEventListener('change', e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const clientSelect = document.getElementById('doc-upload-client');
+    const clientId = clientSelect && clientSelect.value ? clientSelect.value : null;
+    const c = clientId ? clientById(clientId) : null;
+    const clientSuffix = c ? ` (linked to <b>${escapeHtml(c.name)}</b>)` : '';
+    const MAX_BYTES = 4.5*1024*1024; // storage backend caps a value at 5MB; leave headroom for JSON overhead
+    if(file.size > MAX_BYTES){
+      toast('File too large to store (max 4.5MB) — uploaded name only, content not saved');
+      DB.documents.unshift({name:file.name, ts:Date.now(), size:file.size, type:file.type, dataUrl:null, clientId});
+      logActivity('note', `Document uploaded: <b>${escapeHtml(file.name)}</b>${clientSuffix}`);
+      saveDB();
+      renderDocuments();
+      renderActivityFull();
+      renderDashboard();
+      e.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      DB.documents.unshift({name:file.name, ts:Date.now(), size:file.size, type:file.type, dataUrl:reader.result, clientId});
+      logActivity('note', `Document uploaded: <b>${escapeHtml(file.name)}</b>${clientSuffix}`);
+      saveDB();
+      renderDocuments();
+      renderActivityFull();
+      renderDashboard();
+      toast('Uploaded '+file.name);
+    };
+    reader.onerror = ()=>{ toast('Could not read '+file.name); };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
+
+  // Settings form
+  document.getElementById('settings-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    DB.profile.name = document.getElementById('settings-name').value.trim() || DB.profile.name;
+    DB.profile.role = document.getElementById('settings-role').value.trim() || DB.profile.role;
+    saveDB();
+    renderProfile();
+    toast('Profile updated');
+  });
+
+  // Theme dropdown toggle
+  const themeBtn = document.getElementById('theme-btn');
+  const themeDropdown = document.getElementById('theme-dropdown');
+  themeBtn.addEventListener('click', e=>{
+    e.stopPropagation();
+    themeDropdown.classList.toggle('open');
+    document.getElementById('notif-dropdown').classList.remove('open');
+    document.getElementById('profile-dropdown').classList.remove('open');
+  });
+  themeDropdown.addEventListener('click', e=>{ e.stopPropagation(); });
+
+  // Theme swatches — both the topbar dropdown and the Settings > Appearance
+  // panel share the .theme-swatch class, so one listener covers both.
+  document.querySelectorAll('.theme-swatch').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      applyTheme(btn.getAttribute('data-theme'));
+      themeDropdown.classList.remove('open');
+    });
+  });
+
+  // Sidebar promo card dismiss
+  const promoCard = document.getElementById('promo-card');
+  const promoDismiss = document.getElementById('promo-dismiss');
+  if(promoDismiss){
+    promoDismiss.addEventListener('click', e=>{
+      e.stopPropagation();
+      promoCard.classList.add('hidden');
+      try{ localStorage.setItem('aureum_promo_dismissed', '1'); }catch(err){ /* ignore */ }
+    });
+  }
+
+  // Notification dropdown toggle
+  const notifBtn = document.getElementById('notif-btn');
+  const notifDropdown = document.getElementById('notif-dropdown');
+  notifBtn.addEventListener('click', e=>{
+    e.stopPropagation();
+    notifDropdown.classList.toggle('open');
+    themeDropdown.classList.remove('open');
+    document.getElementById('profile-dropdown').classList.remove('open');
+  });
+  // notif-dropdown is nested inside notif-btn in the markup, so without this,
+  // any click on its contents (e.g. dismissing a notification) bubbles up to
+  // notifBtn's own click handler above and immediately toggles the dropdown
+  // closed again — you'd only ever be able to dismiss one notification before
+  // it slammed shut. Stop it from bubbling past the dropdown itself.
+  notifDropdown.addEventListener('click', e=>{ e.stopPropagation(); });
+
+  // Profile dropdown toggle
+  const profileCard = document.getElementById('profile-card');
+  const profileDropdown = document.getElementById('profile-dropdown');
+  profileCard.addEventListener('click', e=>{
+    e.stopPropagation();
+    profileDropdown.classList.toggle('open');
+    notifDropdown.classList.remove('open');
+    themeDropdown.classList.remove('open');
+  });
+  profileDropdown.addEventListener('click', e=>{
+    const action = e.target.getAttribute('data-action');
+    if(action==='goto-settings'){ gotoView('settings'); }
+    if(action==='unlock-license'){ showLockScreen(); }
+    if(action==='reset-demo'){
+      if(confirm('Reset all demo data back to the original seed? This cannot be undone.')){
+        (async ()=>{
+          await clearDB();
+          await loadDB();
+          renderAll();
+          animateAUM();
+          toast('Demo data reset');
+        })();
+      }
+    }
+    if(action==='sign-out'){
+      toast('Signed out (demo only — no auth backend connected)');
+    }
+    profileDropdown.classList.remove('open');
+  });
+
+  // Trial badge — click to open the license/unlock screen at any time
+  const trialBadge = document.getElementById('trial-badge');
+  if(trialBadge){
+    trialBadge.addEventListener('click', e=>{
+      e.stopPropagation();
+      showLockScreen();
+    });
+  }
+
+  // close dropdowns / modal on outside click
+  document.addEventListener('click', ()=>{
+    notifDropdown.classList.remove('open');
+    profileDropdown.classList.remove('open');
+    themeDropdown.classList.remove('open');
+  });
+  document.getElementById('modal-overlay').addEventListener('click', e=>{
+    if(e.target.id==='modal-overlay') closeModal();
+  });
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape') closeModal();
+  });
+}
+
+/* ================= AUM count-up ================= */
+function animateAUM(){
+  const el = document.getElementById('aum');
+  const target = totalAUM();
+  let cur = 0;
+  const dur = 1100;
+  const start = performance.now();
+  function frame(t){
+    const p = Math.min(1, (t - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    cur = target * eased;
+    el.innerHTML = fmtCr(cur);
+    if(p < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ================= Init ================= */
+async function init(){
+  try{
+    await loadDB();
+  }catch(e){
+    DB = seedDB();
+  }
+  wireEvents();
+  renderAll();
+  animateAUM();
+  try{
+    if(localStorage.getItem('aureum_promo_dismissed')==='1'){
+      const promoCard = document.getElementById('promo-card');
+      if(promoCard) promoCard.classList.add('hidden');
+    }
+  }catch(e){ /* ignore */ }
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', ()=>{
+    wireLockScreen();
+    if(isAccessAllowed()){
+      bootApp();
+    }else{
+      showLockScreen();
+    }
+  });
+}else{
+  wireLockScreen();
+  if(isAccessAllowed()){
+    bootApp();
+  }else{
+    showLockScreen();
+  }
+}
+
+})();
+
+</script>
+</body>
+</html>
