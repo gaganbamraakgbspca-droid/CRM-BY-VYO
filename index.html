@@ -533,6 +533,7 @@
     .sidebar{
       position:fixed;left:0;top:0;height:100vh;z-index:150;
       transform:translateX(-100%);transition:transform .25s ease;
+      width:264px;
     }
     .sidebar.open{transform:translateX(0);box-shadow:0 0 40px rgba(0,0,0,.5);}
     .sidebar-scrim{
@@ -541,9 +542,137 @@
     .sidebar-scrim.open{display:block;}
     .content, .topbar{padding-left:20px;padding-right:20px;}
     .stats{grid-template-columns:1fr 1fr;}
+  }
+
+  /* ---------- Phone (≤640px) ---------- */
+  @media (max-width:640px){
+    html,body{overflow-x:hidden;}
+    body{font-size:13px;}
+
+    /* Topbar: wrap into rows, search full-width, controls shrink */
+    .topbar{
+      flex-wrap:wrap;
+      padding:14px 16px;
+      gap:8px;
+      row-gap:10px;
+    }
+    .search{order:2;flex:1 1 100%;max-width:none;}
+    .topbar-spacer{display:none;}
+    .unit-select-wrap{order:3;}
+    .unit-select-label{display:none;}
+    #amount-unit-select{padding:7px 8px;font-size:11.5px;}
+    .trial-badge{order:3;padding:6px 9px;font-size:10.5px;}
+    .trial-badge span:not(.trial-dot){white-space:nowrap;}
+    #theme-btn,#notif-btn{order:4;width:32px;height:32px;}
+    #export-btn{order:5;padding:8px 11px;font-size:11.5px;}
+    #new-client-btn{order:6;padding:8px 12px;font-size:11.5px;flex:1 1 auto;justify-content:center;}
+    .theme-dropdown{right:-16px;left:auto;}
+    .notif-dropdown{right:-16px;width:min(300px,calc(100vw - 32px));}
+
+    .content{padding:24px 16px 0;}
+
+    /* Page headers stack instead of squeezing side by side */
+    .page-head{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:18px;}
+    .page-date{text-align:left;}
+    h1{font-size:24px;}
+    .page-head .btn{width:100%;justify-content:center;}
+    .page-head > div:nth-child(2){width:100%;}
+    .page-head > div:nth-child(2) select{flex:1;min-width:0;}
+
+    /* Stat cards: single column, tighter padding */
+    .stats{grid-template-columns:1fr;margin-bottom:24px;}
+    .stat{padding:16px 18px;}
+    .stat-value{font-size:23px;}
+
+    .grid-2{gap:16px;margin-bottom:24px;}
+    .panel-head{padding:16px 18px;flex-wrap:wrap;gap:8px;}
+    .pipeline,.activity{padding:4px 18px 16px;}
+
+    /* Toolbar above the client ledger */
+    .clients-toolbar{flex-direction:column;align-items:stretch;}
+    .toolbar-controls{flex-direction:column;}
+    .toolbar-controls .mini-input,.toolbar-controls .mini-select{width:100%;}
+    .bulk-bar{flex-wrap:wrap;padding:10px 16px;}
+    .bulk-bar .btn{padding:6px 10px;font-size:11.5px;}
+
+    /* Client ledger: turn each row into a stacked card */
+    table{border-spacing:0 10px;border-collapse:separate;margin-top:-4px;}
     thead{display:none;}
-    tbody td{display:block;padding:6px 20px;}
-    tbody tr{padding:10px 0;}
+    tbody{display:block;}
+    tbody tr{
+      display:flex;flex-direction:column;
+      background:var(--panel-2);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:12px 14px 6px;
+      position:relative;
+      margin:0 18px 10px;
+    }
+    tbody tr:last-child{margin-bottom:4px;}
+    tbody td{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:8px 0;
+      border-bottom:1px solid var(--line-soft);
+      font-size:12.5px;
+      text-align:right;
+    }
+    tbody td:last-child{border-bottom:none;}
+    tbody td::before{
+      content:attr(data-label);
+      font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+      color:var(--ivory-faint);flex-shrink:0;text-align:left;
+    }
+    tbody td.td-client{
+      padding:0 0 10px;margin-bottom:6px;
+      border-bottom:1px solid var(--line-soft);
+      justify-content:flex-start;text-align:left;
+    }
+    tbody td.td-client .client-cell{width:100%;}
+    tbody td.td-check{
+      position:absolute;top:10px;right:12px;
+      padding:0 !important;border:none;width:auto;justify-content:flex-end;
+    }
+    tbody td.td-check::before{display:none;}
+    th.checkbox-th{display:none;}
+    .ledger-foot{padding:14px 18px;flex-direction:column;align-items:flex-start;gap:10px;}
+    .pager{align-self:stretch;justify-content:space-between;}
+
+    /* Kanban board columns become full-width stacked lists */
+    .kanban{grid-template-columns:1fr;gap:12px;}
+
+    /* Modals: near-fullscreen on phones */
+    .modal-overlay{padding:0;align-items:flex-end;}
+    .modal{
+      max-width:none;width:100%;
+      max-height:92vh;
+      border-radius:var(--radius) var(--radius) 0 0;
+      animation:sheet-up .25s ease both;
+    }
+    .modal-head{padding:16px 18px;}
+    .modal-body{padding:16px 18px 22px;}
+    .detail-grid{grid-template-columns:1fr 1fr;gap:10px 14px;}
+    .form-actions{flex-direction:column;}
+    .form-actions .btn{width:100%;justify-content:center;}
+    .duration-grid{grid-template-columns:1fr 1fr;}
+
+    /* Lock screen card */
+    .lock-card{padding:26px 20px;}
+
+    /* Toasts span the width instead of hugging a corner */
+    .toast-wrap{left:12px;right:12px;bottom:16px;}
+    .toast{width:100%;}
+
+    #profile-dropdown{left:12px;right:12px;bottom:70px;}
+  }
+
+  @keyframes sheet-up{
+    from{opacity:0;transform:translateY(24px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  @media (max-width:380px){
+    .detail-grid{grid-template-columns:1fr;}
+    .stat-value{font-size:21px;}
   }
 
   /* ---------- Views ---------- */
@@ -2009,12 +2138,12 @@ function renderActivityFull(){
 function clientRow(c){
   const tierClass = c.tier;
   return `<tr class="clickable" data-id="${c.id}">
-    <td><div class="client-cell"><div class="client-avatar">${c.initials}</div><div><div class="client-name">${escapeHtml(c.name)}</div><div class="client-sub">Client since ${c.since}</div></div></div></td>
-    <td><span class="tier ${tierClass}">${tierLabel(c.tier)}</span></td>
-    <td class="num">${fmtCr(c.aum)}</td>
-    <td><div class="rm-cell"><div class="rm-dot">${c.rm}</div>${rmName(c.rm)}</div></td>
-    <td class="num">${contactLabel(c.lastContactDays)}</td>
-    <td><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></td>
+    <td class="td-client"><div class="client-cell"><div class="client-avatar">${c.initials}</div><div><div class="client-name">${escapeHtml(c.name)}</div><div class="client-sub">Client since ${c.since}</div></div></div></td>
+    <td data-label="Tier"><span class="tier ${tierClass}">${tierLabel(c.tier)}</span></td>
+    <td class="num" data-label="AUM">${fmtCr(c.aum)}</td>
+    <td data-label="Relationship Manager"><div class="rm-cell"><div class="rm-dot">${c.rm}</div>${rmName(c.rm)}</div></td>
+    <td class="num" data-label="Last Contact">${contactLabel(c.lastContactDays)}</td>
+    <td data-label="Status"><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></td>
   </tr>`;
 }
 function bindClientRowClicks(container){
@@ -2030,13 +2159,13 @@ function clientRowSelectable(c){
   const tierClass = c.tier;
   const checked = clientsState.selected.has(c.id) ? 'checked' : '';
   return `<tr class="clickable" data-id="${c.id}">
-    <td class="checkbox-cell"><input type="checkbox" class="row-select" data-id="${c.id}" ${checked}></td>
-    <td><div class="client-cell"><div class="client-avatar">${c.initials}</div><div><div class="client-name">${escapeHtml(c.name)}</div><div class="client-sub">Client since ${c.since}</div></div></div></td>
-    <td><span class="tier ${tierClass}">${tierLabel(c.tier)}</span></td>
-    <td class="num">${fmtCr(c.aum)}</td>
-    <td><div class="rm-cell"><div class="rm-dot">${c.rm}</div>${rmName(c.rm)}</div></td>
-    <td class="num">${contactLabel(c.lastContactDays)}</td>
-    <td><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></td>
+    <td class="checkbox-cell td-check"><input type="checkbox" class="row-select" data-id="${c.id}" ${checked}></td>
+    <td class="td-client"><div class="client-cell"><div class="client-avatar">${c.initials}</div><div><div class="client-name">${escapeHtml(c.name)}</div><div class="client-sub">Client since ${c.since}</div></div></div></td>
+    <td data-label="Tier"><span class="tier ${tierClass}">${tierLabel(c.tier)}</span></td>
+    <td class="num" data-label="AUM">${fmtCr(c.aum)}</td>
+    <td data-label="Relationship Manager"><div class="rm-cell"><div class="rm-dot">${c.rm}</div>${rmName(c.rm)}</div></td>
+    <td class="num" data-label="Last Contact">${contactLabel(c.lastContactDays)}</td>
+    <td data-label="Status"><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></td>
   </tr>`;
 }
 
