@@ -295,6 +295,8 @@
     background:transparent;
   }
   .btn-ghost:hover{border-color:var(--brass-dim);color:var(--ivory);}
+  .btn-danger{border:1px solid var(--oxblood);color:var(--oxblood);background:transparent;}
+  .btn-danger:hover{background:var(--oxblood);color:var(--ivory);}
 
   .icon-btn{
     width:34px;height:34px;
@@ -512,6 +514,7 @@
     padding:16px 22px;
     display:flex;justify-content:space-between;align-items:center;
     color:var(--ivory-faint);font-size:11.5px;
+    gap:14px;flex-wrap:wrap;
   }
 
   @keyframes rise{
@@ -726,6 +729,34 @@
   .mini-input::placeholder{color:var(--ivory-faint);}
   tbody tr.clickable{cursor:pointer;}
 
+  /* Always-visible "select all" toggle for the client ledger — the header
+     checkbox lives in <thead>, which is hidden on the mobile card layout,
+     so this stays reachable at every screen width. */
+  .select-all-toggle{
+    display:flex;align-items:center;gap:7px;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);
+    padding:7px 12px;border-radius:var(--radius);
+    font-size:12.5px;color:var(--ivory-dim);user-select:none;
+  }
+  .select-all-toggle:hover{color:var(--ivory);border-color:var(--brass-dim);}
+  .select-all-toggle input{width:14px;height:14px;accent-color:var(--brass);flex-shrink:0;}
+
+  /* ---------- Rows-per-page selector ---------- */
+  .per-page-select{
+    display:flex;align-items:center;gap:6px;
+    font-size:11.5px;color:var(--ivory-faint);
+  }
+  .per-page-select select{
+    background:var(--panel);border:1px solid var(--line);color:var(--ivory);
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;
+    padding:5px 8px;border-radius:var(--radius);outline:none;
+  }
+  .per-page-select select:focus{border-color:var(--brass-dim);}
+  @media (max-width:640px){
+    .select-all-toggle{width:100%;justify-content:center;}
+    .per-page-select{width:100%;justify-content:space-between;}
+  }
+
   /* ---------- Amount unit selector ---------- */
   .unit-select-wrap{display:flex;align-items:center;gap:8px;}
   .unit-select-label{font-size:11px;color:var(--ivory-faint);white-space:nowrap;}
@@ -862,6 +893,27 @@
   .modal-close{cursor:pointer;color:var(--ivory-faint);font-size:20px;line-height:1;}
   .modal-close:hover{color:var(--ivory);}
   .modal-body{padding:20px 22px;}
+
+  /* ---------- Confirm dialog (replaces window.confirm, which browser/
+     sandboxed-iframe environments can silently block) ---------- */
+  .confirm-overlay{
+    position:fixed;inset:0;background:rgba(8,7,5,.78);
+    display:none;align-items:center;justify-content:center;z-index:300;
+    padding:20px;backdrop-filter:blur(3px);
+  }
+  .confirm-overlay.open{display:flex;}
+  .confirm-box{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    width:100%;max-width:360px;padding:22px;animation:rise .2s ease both;
+  }
+  .confirm-msg{font-size:13.5px;line-height:1.5;color:var(--ivory);margin-bottom:18px;}
+  .confirm-actions{display:flex;justify-content:flex-end;gap:10px;}
+  @media (max-width:640px){
+    .confirm-overlay{align-items:flex-end;padding:0;}
+    .confirm-box{max-width:none;border-radius:var(--radius) var(--radius) 0 0;animation:sheet-up .25s ease both;}
+    .confirm-actions{flex-direction:column-reverse;}
+    .confirm-actions .btn{width:100%;justify-content:center;}
+  }
 
   .form-grid{display:grid;gap:14px;}
   .form-grid label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--ivory-dim);}
@@ -1257,6 +1309,10 @@
       <div class="panel-head clients-toolbar">
         <div class="panel-title">All Relationships</div>
         <div class="toolbar-controls">
+          <label class="select-all-toggle" for="clients-select-all-toggle">
+            <input type="checkbox" id="clients-select-all-toggle" aria-label="Select all clients on this page">
+            <span>Select all</span>
+          </label>
           <input type="text" id="clients-search" class="mini-input" placeholder="Filter by name…">
           <select id="clients-tier-filter" class="mini-select">
             <option value="">All tiers</option>
@@ -1295,6 +1351,14 @@
       </table>
       <div class="ledger-foot">
         <span id="clients-count"></span>
+        <div class="per-page-select">
+          <label for="clients-per-page">Rows per page</label>
+          <select id="clients-per-page">
+            <option value="10">10</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
         <div class="pager" id="clients-pager"></div>
       </div>
     </div>
@@ -1426,6 +1490,16 @@
 
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal" id="modal-box"></div>
+</div>
+
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-actions">
+      <button type="button" class="btn btn-ghost" id="confirm-cancel-btn">Cancel</button>
+      <button type="button" class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+    </div>
+  </div>
 </div>
 
 <div class="lock-overlay" id="lock-overlay">
@@ -1978,6 +2052,32 @@ function closeModal(){
   document.getElementById('modal-box').innerHTML = '';
 }
 
+/* ================= Confirm dialog =================
+   Replaces window.confirm(), which many mobile browsers and sandboxed
+   embeds (e.g. an app opened inside another app's webview/iframe) block
+   or silently no-op — that's what made "Delete client" look broken.
+   This is an in-app modal instead, so it always actually shows up and
+   the action only fires once the user taps Confirm. */
+function showConfirm(message, onConfirm){
+  const overlay = document.getElementById('confirm-overlay');
+  document.getElementById('confirm-msg').textContent = message;
+  overlay.classList.add('open');
+
+  const okBtn = document.getElementById('confirm-ok-btn');
+  const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+  // Clone-and-replace to strip any listeners from a previous confirm call
+  // before attaching this one's handler.
+  const newOk = okBtn.cloneNode(true);
+  okBtn.parentNode.replaceChild(newOk, okBtn);
+  const newCancel = cancelBtn.cloneNode(true);
+  cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+
+  function close(){ overlay.classList.remove('open'); }
+  newOk.addEventListener('click', ()=>{ close(); onConfirm(); });
+  newCancel.addEventListener('click', close);
+}
+
 /* ================= Rendering ================= */
 function renderAll(){
   renderGreetingAndDate();
@@ -2174,13 +2274,18 @@ function updateBulkBar(){
   const count = clientsState.selected.size;
   bar.classList.toggle('open', count>0);
   document.getElementById('clients-selected-count').textContent = count;
-  const selectAll = document.getElementById('clients-select-all');
-  if(selectAll){
-    const idsOnPage = Array.from(document.querySelectorAll('#clients-body input.row-select')).map(cb=>cb.getAttribute('data-id'));
-    const allChecked = idsOnPage.length>0 && idsOnPage.every(id=>clientsState.selected.has(id));
-    selectAll.checked = allChecked;
-    selectAll.indeterminate = !allChecked && idsOnPage.some(id=>clientsState.selected.has(id));
-  }
+  // Two checkboxes drive select-all: the <thead> one (desktop table) and the
+  // always-visible toolbar toggle (needed on mobile, where thead is hidden).
+  // Keep both in sync with the actual selection state.
+  const idsOnPage = Array.from(document.querySelectorAll('#clients-body input.row-select')).map(cb=>cb.getAttribute('data-id'));
+  const allChecked = idsOnPage.length>0 && idsOnPage.every(id=>clientsState.selected.has(id));
+  const anyChecked = idsOnPage.some(id=>clientsState.selected.has(id));
+  ['clients-select-all','clients-select-all-toggle'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.checked = allChecked;
+    el.indeterminate = !allChecked && anyChecked;
+  });
 }
 
 function bindClientSelectionEvents(container){
@@ -2219,7 +2324,7 @@ function deleteClients(ids){
 }
 
 /* ---------- Clients view (search / filter / sort / paginate) ---------- */
-const clientsState = { query:'', tier:'', sort:'name', page:1, perPage:12, selected:new Set() };
+const clientsState = { query:'', tier:'', sort:'name', page:1, perPage:10, selected:new Set() };
 
 function filteredSortedClients(){
   let list = DB.clients.filter(c=>{
@@ -2572,10 +2677,10 @@ function openClientDetail(id){
     closeModal();
   });
   document.getElementById('delete-client-btn').addEventListener('click', ()=>{
-    if(confirm(`Delete ${c.name} from the client ledger? This cannot be undone.`)){
+    showConfirm(`Delete ${c.name} from the client ledger? This cannot be undone.`, ()=>{
       closeModal();
       deleteClients([c.id]);
-    }
+    });
   });
 
   // Follow-ups scoped to this client
@@ -2839,13 +2944,29 @@ function wireEvents(){
     renderClientsView();
   });
 
-  // Select-all (current page) checkbox
-  document.getElementById('clients-select-all').addEventListener('change', e=>{
-    const idsOnPage = Array.from(document.querySelectorAll('#clients-body input.row-select')).map(cb=>cb.getAttribute('data-id'));
-    if(e.target.checked) idsOnPage.forEach(id=>clientsState.selected.add(id));
-    else idsOnPage.forEach(id=>clientsState.selected.delete(id));
-    renderClientsView();
+  // Select-all (current page) checkbox — bound to both the desktop <thead>
+  // checkbox and the always-visible toolbar toggle used on mobile.
+  ['clients-select-all','clients-select-all-toggle'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('change', e=>{
+      const idsOnPage = Array.from(document.querySelectorAll('#clients-body input.row-select')).map(cb=>cb.getAttribute('data-id'));
+      if(e.target.checked) idsOnPage.forEach(pid=>clientsState.selected.add(pid));
+      else idsOnPage.forEach(pid=>clientsState.selected.delete(pid));
+      renderClientsView();
+    });
   });
+
+  // Rows-per-page selector
+  const perPageSelect = document.getElementById('clients-per-page');
+  if(perPageSelect){
+    perPageSelect.value = String(clientsState.perPage);
+    perPageSelect.addEventListener('change', e=>{
+      clientsState.perPage = parseInt(e.target.value, 10) || 10;
+      clientsState.page = 1;
+      renderClientsView();
+    });
+  }
 
   // Bulk actions bar
   document.getElementById('clients-clear-selection-btn').addEventListener('click', ()=>{
@@ -2855,9 +2976,9 @@ function wireEvents(){
   document.getElementById('clients-bulk-delete-btn').addEventListener('click', ()=>{
     const ids = Array.from(clientsState.selected);
     if(!ids.length) return;
-    if(confirm(`Delete ${ids.length} selected client${ids.length>1?'s':''}? This cannot be undone.`)){
+    showConfirm(`Delete ${ids.length} selected client${ids.length>1?'s':''}? This cannot be undone.`, ()=>{
       deleteClients(ids);
-    }
+    });
   });
 
   // Amount unit selector — reformats every money figure across the app
@@ -2982,7 +3103,7 @@ function wireEvents(){
     if(action==='goto-settings'){ gotoView('settings'); }
     if(action==='unlock-license'){ showLockScreen(); }
     if(action==='reset-demo'){
-      if(confirm('Reset all demo data back to the original seed? This cannot be undone.')){
+      showConfirm('Reset all demo data back to the original seed? This cannot be undone.', ()=>{
         (async ()=>{
           await clearDB();
           await loadDB();
@@ -2990,7 +3111,7 @@ function wireEvents(){
           animateAUM();
           toast('Demo data reset');
         })();
-      }
+      });
     }
     if(action==='sign-out'){
       toast('Signed out (demo only — no auth backend connected)');
@@ -3016,8 +3137,14 @@ function wireEvents(){
   document.getElementById('modal-overlay').addEventListener('click', e=>{
     if(e.target.id==='modal-overlay') closeModal();
   });
+  document.getElementById('confirm-overlay').addEventListener('click', e=>{
+    if(e.target.id==='confirm-overlay') e.currentTarget.classList.remove('open');
+  });
   document.addEventListener('keydown', e=>{
-    if(e.key==='Escape') closeModal();
+    if(e.key==='Escape'){
+      closeModal();
+      document.getElementById('confirm-overlay').classList.remove('open');
+    }
   });
 }
 
