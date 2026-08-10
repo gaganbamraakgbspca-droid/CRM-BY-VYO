@@ -295,8 +295,6 @@
     background:transparent;
   }
   .btn-ghost:hover{border-color:var(--brass-dim);color:var(--ivory);}
-  .btn-danger{border:1px solid var(--oxblood);color:var(--oxblood);background:transparent;}
-  .btn-danger:hover{background:var(--oxblood);color:var(--ivory);}
 
   .icon-btn{
     width:34px;height:34px;
@@ -514,7 +512,6 @@
     padding:16px 22px;
     display:flex;justify-content:space-between;align-items:center;
     color:var(--ivory-faint);font-size:11.5px;
-    gap:14px;flex-wrap:wrap;
   }
 
   @keyframes rise{
@@ -536,7 +533,6 @@
     .sidebar{
       position:fixed;left:0;top:0;height:100vh;z-index:150;
       transform:translateX(-100%);transition:transform .25s ease;
-      width:264px;
     }
     .sidebar.open{transform:translateX(0);box-shadow:0 0 40px rgba(0,0,0,.5);}
     .sidebar-scrim{
@@ -545,137 +541,9 @@
     .sidebar-scrim.open{display:block;}
     .content, .topbar{padding-left:20px;padding-right:20px;}
     .stats{grid-template-columns:1fr 1fr;}
-  }
-
-  /* ---------- Phone (≤640px) ---------- */
-  @media (max-width:640px){
-    html,body{overflow-x:hidden;}
-    body{font-size:13px;}
-
-    /* Topbar: wrap into rows, search full-width, controls shrink */
-    .topbar{
-      flex-wrap:wrap;
-      padding:14px 16px;
-      gap:8px;
-      row-gap:10px;
-    }
-    .search{order:2;flex:1 1 100%;max-width:none;}
-    .topbar-spacer{display:none;}
-    .unit-select-wrap{order:3;}
-    .unit-select-label{display:none;}
-    #amount-unit-select{padding:7px 8px;font-size:11.5px;}
-    .trial-badge{order:3;padding:6px 9px;font-size:10.5px;}
-    .trial-badge span:not(.trial-dot){white-space:nowrap;}
-    #theme-btn,#notif-btn{order:4;width:32px;height:32px;}
-    #export-btn{order:5;padding:8px 11px;font-size:11.5px;}
-    #new-client-btn{order:6;padding:8px 12px;font-size:11.5px;flex:1 1 auto;justify-content:center;}
-    .theme-dropdown{right:-16px;left:auto;}
-    .notif-dropdown{right:-16px;width:min(300px,calc(100vw - 32px));}
-
-    .content{padding:24px 16px 0;}
-
-    /* Page headers stack instead of squeezing side by side */
-    .page-head{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:18px;}
-    .page-date{text-align:left;}
-    h1{font-size:24px;}
-    .page-head .btn{width:100%;justify-content:center;}
-    .page-head > div:nth-child(2){width:100%;}
-    .page-head > div:nth-child(2) select{flex:1;min-width:0;}
-
-    /* Stat cards: single column, tighter padding */
-    .stats{grid-template-columns:1fr;margin-bottom:24px;}
-    .stat{padding:16px 18px;}
-    .stat-value{font-size:23px;}
-
-    .grid-2{gap:16px;margin-bottom:24px;}
-    .panel-head{padding:16px 18px;flex-wrap:wrap;gap:8px;}
-    .pipeline,.activity{padding:4px 18px 16px;}
-
-    /* Toolbar above the client ledger */
-    .clients-toolbar{flex-direction:column;align-items:stretch;}
-    .toolbar-controls{flex-direction:column;}
-    .toolbar-controls .mini-input,.toolbar-controls .mini-select{width:100%;}
-    .bulk-bar{flex-wrap:wrap;padding:10px 16px;}
-    .bulk-bar .btn{padding:6px 10px;font-size:11.5px;}
-
-    /* Client ledger: turn each row into a stacked card */
-    table{border-spacing:0 10px;border-collapse:separate;margin-top:-4px;}
     thead{display:none;}
-    tbody{display:block;}
-    tbody tr{
-      display:flex;flex-direction:column;
-      background:var(--panel-2);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:12px 14px 6px;
-      position:relative;
-      margin:0 18px 10px;
-    }
-    tbody tr:last-child{margin-bottom:4px;}
-    tbody td{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:8px 0;
-      border-bottom:1px solid var(--line-soft);
-      font-size:12.5px;
-      text-align:right;
-    }
-    tbody td:last-child{border-bottom:none;}
-    tbody td::before{
-      content:attr(data-label);
-      font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-      color:var(--ivory-faint);flex-shrink:0;text-align:left;
-    }
-    tbody td.td-client{
-      padding:0 0 10px;margin-bottom:6px;
-      border-bottom:1px solid var(--line-soft);
-      justify-content:flex-start;text-align:left;
-    }
-    tbody td.td-client .client-cell{width:100%;}
-    tbody td.td-check{
-      position:absolute;top:10px;right:12px;
-      padding:0 !important;border:none;width:auto;justify-content:flex-end;
-    }
-    tbody td.td-check::before{display:none;}
-    th.checkbox-th{display:none;}
-    .ledger-foot{padding:14px 18px;flex-direction:column;align-items:flex-start;gap:10px;}
-    .pager{align-self:stretch;justify-content:space-between;}
-
-    /* Kanban board columns become full-width stacked lists */
-    .kanban{grid-template-columns:1fr;gap:12px;}
-
-    /* Modals: near-fullscreen on phones */
-    .modal-overlay{padding:0;align-items:flex-end;}
-    .modal{
-      max-width:none;width:100%;
-      max-height:92vh;
-      border-radius:var(--radius) var(--radius) 0 0;
-      animation:sheet-up .25s ease both;
-    }
-    .modal-head{padding:16px 18px;}
-    .modal-body{padding:16px 18px 22px;}
-    .detail-grid{grid-template-columns:1fr 1fr;gap:10px 14px;}
-    .form-actions{flex-direction:column;}
-    .form-actions .btn{width:100%;justify-content:center;}
-    .duration-grid{grid-template-columns:1fr 1fr;}
-
-    /* Lock screen card */
-    .lock-card{padding:26px 20px;}
-
-    /* Toasts span the width instead of hugging a corner */
-    .toast-wrap{left:12px;right:12px;bottom:16px;}
-    .toast{width:100%;}
-
-    #profile-dropdown{left:12px;right:12px;bottom:70px;}
-  }
-
-  @keyframes sheet-up{
-    from{opacity:0;transform:translateY(24px);}
-    to{opacity:1;transform:translateY(0);}
-  }
-
-  @media (max-width:380px){
-    .detail-grid{grid-template-columns:1fr;}
-    .stat-value{font-size:21px;}
+    tbody td{display:block;padding:6px 20px;}
+    tbody tr{padding:10px 0;}
   }
 
   /* ---------- Views ---------- */
@@ -728,34 +596,6 @@
   .mini-input:focus,.mini-select:focus{border-color:var(--brass-dim);}
   .mini-input::placeholder{color:var(--ivory-faint);}
   tbody tr.clickable{cursor:pointer;}
-
-  /* Always-visible "select all" toggle for the client ledger — the header
-     checkbox lives in <thead>, which is hidden on the mobile card layout,
-     so this stays reachable at every screen width. */
-  .select-all-toggle{
-    display:flex;align-items:center;gap:7px;cursor:pointer;
-    background:var(--panel);border:1px solid var(--line);
-    padding:7px 12px;border-radius:var(--radius);
-    font-size:12.5px;color:var(--ivory-dim);user-select:none;
-  }
-  .select-all-toggle:hover{color:var(--ivory);border-color:var(--brass-dim);}
-  .select-all-toggle input{width:14px;height:14px;accent-color:var(--brass);flex-shrink:0;}
-
-  /* ---------- Rows-per-page selector ---------- */
-  .per-page-select{
-    display:flex;align-items:center;gap:6px;
-    font-size:11.5px;color:var(--ivory-faint);
-  }
-  .per-page-select select{
-    background:var(--panel);border:1px solid var(--line);color:var(--ivory);
-    font-family:'IBM Plex Mono',monospace;font-size:11.5px;
-    padding:5px 8px;border-radius:var(--radius);outline:none;
-  }
-  .per-page-select select:focus{border-color:var(--brass-dim);}
-  @media (max-width:640px){
-    .select-all-toggle{width:100%;justify-content:center;}
-    .per-page-select{width:100%;justify-content:space-between;}
-  }
 
   /* ---------- Amount unit selector ---------- */
   .unit-select-wrap{display:flex;align-items:center;gap:8px;}
@@ -893,27 +733,6 @@
   .modal-close{cursor:pointer;color:var(--ivory-faint);font-size:20px;line-height:1;}
   .modal-close:hover{color:var(--ivory);}
   .modal-body{padding:20px 22px;}
-
-  /* ---------- Confirm dialog (replaces window.confirm, which browser/
-     sandboxed-iframe environments can silently block) ---------- */
-  .confirm-overlay{
-    position:fixed;inset:0;background:rgba(8,7,5,.78);
-    display:none;align-items:center;justify-content:center;z-index:300;
-    padding:20px;backdrop-filter:blur(3px);
-  }
-  .confirm-overlay.open{display:flex;}
-  .confirm-box{
-    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-    width:100%;max-width:360px;padding:22px;animation:rise .2s ease both;
-  }
-  .confirm-msg{font-size:13.5px;line-height:1.5;color:var(--ivory);margin-bottom:18px;}
-  .confirm-actions{display:flex;justify-content:flex-end;gap:10px;}
-  @media (max-width:640px){
-    .confirm-overlay{align-items:flex-end;padding:0;}
-    .confirm-box{max-width:none;border-radius:var(--radius) var(--radius) 0 0;animation:sheet-up .25s ease both;}
-    .confirm-actions{flex-direction:column-reverse;}
-    .confirm-actions .btn{width:100%;justify-content:center;}
-  }
 
   .form-grid{display:grid;gap:14px;}
   .form-grid label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--ivory-dim);}
@@ -1309,10 +1128,6 @@
       <div class="panel-head clients-toolbar">
         <div class="panel-title">All Relationships</div>
         <div class="toolbar-controls">
-          <label class="select-all-toggle" for="clients-select-all-toggle">
-            <input type="checkbox" id="clients-select-all-toggle" aria-label="Select all clients on this page">
-            <span>Select all</span>
-          </label>
           <input type="text" id="clients-search" class="mini-input" placeholder="Filter by name…">
           <select id="clients-tier-filter" class="mini-select">
             <option value="">All tiers</option>
@@ -1351,14 +1166,6 @@
       </table>
       <div class="ledger-foot">
         <span id="clients-count"></span>
-        <div class="per-page-select">
-          <label for="clients-per-page">Rows per page</label>
-          <select id="clients-per-page">
-            <option value="10">10</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
         <div class="pager" id="clients-pager"></div>
       </div>
     </div>
@@ -1466,8 +1273,8 @@
       <div class="panel-head"><div class="panel-title">Your Profile</div></div>
       <div class="ruler"></div>
       <form id="settings-form" class="form-grid" style="padding:20px 22px;">
-        <label>Full name<input type="text" id="settings-name" required></label>
-        <label>Role<input type="text" id="settings-role" required></label>
+        <label>Full name<input type="text" id="settings-name" name="settings-name" required autocomplete="off"></label>
+        <label>Role<input type="text" id="settings-role" name="settings-role" required autocomplete="off"></label>
         <button type="submit" class="btn btn-primary" style="justify-self:start;">Save changes</button>
       </form>
     </div>
@@ -1490,16 +1297,6 @@
 
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal" id="modal-box"></div>
-</div>
-
-<div class="confirm-overlay" id="confirm-overlay">
-  <div class="confirm-box">
-    <div class="confirm-msg" id="confirm-msg"></div>
-    <div class="confirm-actions">
-      <button type="button" class="btn btn-ghost" id="confirm-cancel-btn">Cancel</button>
-      <button type="button" class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
-    </div>
-  </div>
 </div>
 
 <div class="lock-overlay" id="lock-overlay">
@@ -2052,32 +1849,6 @@ function closeModal(){
   document.getElementById('modal-box').innerHTML = '';
 }
 
-/* ================= Confirm dialog =================
-   Replaces window.confirm(), which many mobile browsers and sandboxed
-   embeds (e.g. an app opened inside another app's webview/iframe) block
-   or silently no-op — that's what made "Delete client" look broken.
-   This is an in-app modal instead, so it always actually shows up and
-   the action only fires once the user taps Confirm. */
-function showConfirm(message, onConfirm){
-  const overlay = document.getElementById('confirm-overlay');
-  document.getElementById('confirm-msg').textContent = message;
-  overlay.classList.add('open');
-
-  const okBtn = document.getElementById('confirm-ok-btn');
-  const cancelBtn = document.getElementById('confirm-cancel-btn');
-
-  // Clone-and-replace to strip any listeners from a previous confirm call
-  // before attaching this one's handler.
-  const newOk = okBtn.cloneNode(true);
-  okBtn.parentNode.replaceChild(newOk, okBtn);
-  const newCancel = cancelBtn.cloneNode(true);
-  cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
-
-  function close(){ overlay.classList.remove('open'); }
-  newOk.addEventListener('click', ()=>{ close(); onConfirm(); });
-  newCancel.addEventListener('click', close);
-}
-
 /* ================= Rendering ================= */
 function renderAll(){
   renderGreetingAndDate();
@@ -2238,12 +2009,12 @@ function renderActivityFull(){
 function clientRow(c){
   const tierClass = c.tier;
   return `<tr class="clickable" data-id="${c.id}">
-    <td class="td-client"><div class="client-cell"><div class="client-avatar">${c.initials}</div><div><div class="client-name">${escapeHtml(c.name)}</div><div class="client-sub">Client since ${c.since}</div></div></div></td>
-    <td data-label="Tier"><span class="tier ${tierClass}">${tierLabel(c.tier)}</span></td>
-    <td class="num" data-label="AUM">${fmtCr(c.aum)}</td>
-    <td data-label="Relationship Manager"><div class="rm-cell"><div class="rm-dot">${c.rm}</div>${rmName(c.rm)}</div></td>
-    <td class="num" data-label="Last Contact">${contactLabel(c.lastContactDays)}</td>
-    <td data-label="Status"><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></td>
+    <td><div class="client-cell"><div class="client-avatar">${c.initials}</div><div><div class="client-name">${escapeHtml(c.name)}</div><div class="client-sub">Client since ${c.since}</div></div></div></td>
+    <td><span class="tier ${tierClass}">${tierLabel(c.tier)}</span></td>
+    <td class="num">${fmtCr(c.aum)}</td>
+    <td><div class="rm-cell"><div class="rm-dot">${c.rm}</div>${rmName(c.rm)}</div></td>
+    <td class="num">${contactLabel(c.lastContactDays)}</td>
+    <td><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></td>
   </tr>`;
 }
 function bindClientRowClicks(container){
@@ -2259,13 +2030,13 @@ function clientRowSelectable(c){
   const tierClass = c.tier;
   const checked = clientsState.selected.has(c.id) ? 'checked' : '';
   return `<tr class="clickable" data-id="${c.id}">
-    <td class="checkbox-cell td-check"><input type="checkbox" class="row-select" data-id="${c.id}" ${checked}></td>
-    <td class="td-client"><div class="client-cell"><div class="client-avatar">${c.initials}</div><div><div class="client-name">${escapeHtml(c.name)}</div><div class="client-sub">Client since ${c.since}</div></div></div></td>
-    <td data-label="Tier"><span class="tier ${tierClass}">${tierLabel(c.tier)}</span></td>
-    <td class="num" data-label="AUM">${fmtCr(c.aum)}</td>
-    <td data-label="Relationship Manager"><div class="rm-cell"><div class="rm-dot">${c.rm}</div>${rmName(c.rm)}</div></td>
-    <td class="num" data-label="Last Contact">${contactLabel(c.lastContactDays)}</td>
-    <td data-label="Status"><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></td>
+    <td class="checkbox-cell"><input type="checkbox" class="row-select" data-id="${c.id}" ${checked}></td>
+    <td><div class="client-cell"><div class="client-avatar">${c.initials}</div><div><div class="client-name">${escapeHtml(c.name)}</div><div class="client-sub">Client since ${c.since}</div></div></div></td>
+    <td><span class="tier ${tierClass}">${tierLabel(c.tier)}</span></td>
+    <td class="num">${fmtCr(c.aum)}</td>
+    <td><div class="rm-cell"><div class="rm-dot">${c.rm}</div>${rmName(c.rm)}</div></td>
+    <td class="num">${contactLabel(c.lastContactDays)}</td>
+    <td><span class="status-dot ${c.status==='dormant'?'idle':''}">${c.status==='dormant'?'Dormant':'Active'}</span></td>
   </tr>`;
 }
 
@@ -2274,18 +2045,13 @@ function updateBulkBar(){
   const count = clientsState.selected.size;
   bar.classList.toggle('open', count>0);
   document.getElementById('clients-selected-count').textContent = count;
-  // Two checkboxes drive select-all: the <thead> one (desktop table) and the
-  // always-visible toolbar toggle (needed on mobile, where thead is hidden).
-  // Keep both in sync with the actual selection state.
-  const idsOnPage = Array.from(document.querySelectorAll('#clients-body input.row-select')).map(cb=>cb.getAttribute('data-id'));
-  const allChecked = idsOnPage.length>0 && idsOnPage.every(id=>clientsState.selected.has(id));
-  const anyChecked = idsOnPage.some(id=>clientsState.selected.has(id));
-  ['clients-select-all','clients-select-all-toggle'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.checked = allChecked;
-    el.indeterminate = !allChecked && anyChecked;
-  });
+  const selectAll = document.getElementById('clients-select-all');
+  if(selectAll){
+    const idsOnPage = Array.from(document.querySelectorAll('#clients-body input.row-select')).map(cb=>cb.getAttribute('data-id'));
+    const allChecked = idsOnPage.length>0 && idsOnPage.every(id=>clientsState.selected.has(id));
+    selectAll.checked = allChecked;
+    selectAll.indeterminate = !allChecked && idsOnPage.some(id=>clientsState.selected.has(id));
+  }
 }
 
 function bindClientSelectionEvents(container){
@@ -2324,7 +2090,7 @@ function deleteClients(ids){
 }
 
 /* ---------- Clients view (search / filter / sort / paginate) ---------- */
-const clientsState = { query:'', tier:'', sort:'name', page:1, perPage:10, selected:new Set() };
+const clientsState = { query:'', tier:'', sort:'name', page:1, perPage:12, selected:new Set() };
 
 function filteredSortedClients(){
   let list = DB.clients.filter(c=>{
@@ -2485,7 +2251,7 @@ function openAddTaskModal(prefillClientId){
     <div class="modal-body">
       <form id="new-task-form" class="form-grid">
         <label>Client<select id="nt-client">${clientOptions}</select></label>
-        <label>What needs to happen<input type="text" id="nt-title" required placeholder="e.g. Call to review portfolio"></label>
+        <label>What needs to happen<input type="text" id="nt-title" name="nt-title" required placeholder="e.g. Call to review portfolio" autocomplete="off"></label>
         <label>Due date<input type="date" id="nt-due" required value="${defaultDue}"></label>
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Add follow-up</button>
@@ -2677,10 +2443,10 @@ function openClientDetail(id){
     closeModal();
   });
   document.getElementById('delete-client-btn').addEventListener('click', ()=>{
-    showConfirm(`Delete ${c.name} from the client ledger? This cannot be undone.`, ()=>{
+    if(confirm(`Delete ${c.name} from the client ledger? This cannot be undone.`)){
       closeModal();
       deleteClients([c.id]);
-    });
+    }
   });
 
   // Follow-ups scoped to this client
@@ -2720,9 +2486,9 @@ function openEditClientModal(id){
     </div>
     <div class="modal-body">
       <form id="edit-client-form" class="form-grid">
-        <label>Client name<input type="text" id="ec-name" required value="${escapeHtml(c.name)}"></label>
-        <label>Email<input type="email" id="ec-email" value="${escapeHtml(c.email||'')}" placeholder="client@example.com"></label>
-        <label>Phone<input type="tel" id="ec-phone" value="${escapeHtml(c.phone||'')}" placeholder="+91 98765 43210"></label>
+        <label>Client name<input type="text" id="ec-name" name="ec-name" required value="${escapeHtml(c.name)}" autocomplete="off"></label>
+        <label>Email<input type="email" id="ec-email" name="ec-email" value="${escapeHtml(c.email||'')}" placeholder="client@example.com" autocomplete="off"></label>
+        <label>Phone<input type="tel" id="ec-phone" name="ec-phone" value="${escapeHtml(c.phone||'')}" placeholder="+91 98765 43210" autocomplete="off"></label>
         <label>Tier
           <select id="ec-tier">
             <option value="standard" ${c.tier==='standard'?'selected':''}>Standard</option>
@@ -2730,7 +2496,7 @@ function openEditClientModal(id){
             <option value="private" ${c.tier==='private'?'selected':''}>Private</option>
           </select>
         </label>
-        <label>AUM (₹ Cr)<input type="number" id="ec-aum" min="0" step="0.1" required value="${c.aum}"></label>
+        <label>AUM (₹ Cr)<input type="number" id="ec-aum" name="ec-aum" min="0" step="0.1" inputmode="decimal" required value="${c.aum}" autocomplete="off"></label>
         <label>Relationship Manager<select id="ec-rm">${rmOptions}</select></label>
         <label>Status
           <select id="ec-status">
@@ -2778,9 +2544,9 @@ function openNewClientModal(){
     </div>
     <div class="modal-body">
       <form id="new-client-form" class="form-grid">
-        <label>Client name<input type="text" id="nc-name" required placeholder="e.g. Ramesh Kulkarni"></label>
-        <label>Email<input type="email" id="nc-email" placeholder="client@example.com"></label>
-        <label>Phone<input type="tel" id="nc-phone" placeholder="+91 98765 43210"></label>
+        <label>Client name<input type="text" id="nc-name" name="nc-name" required placeholder="e.g. Ramesh Kulkarni" autocomplete="off"></label>
+        <label>Email<input type="email" id="nc-email" name="nc-email" placeholder="client@example.com" autocomplete="off"></label>
+        <label>Phone<input type="tel" id="nc-phone" name="nc-phone" placeholder="+91 98765 43210" autocomplete="off"></label>
         <label>Tier
           <select id="nc-tier">
             <option value="standard">Standard</option>
@@ -2788,7 +2554,7 @@ function openNewClientModal(){
             <option value="private">Private</option>
           </select>
         </label>
-        <label>AUM (₹ Cr)<input type="number" id="nc-aum" min="0" step="0.1" required placeholder="e.g. 2.5"></label>
+        <label>AUM (₹ Cr)<input type="number" id="nc-aum" name="nc-aum" min="0" step="0.1" inputmode="decimal" required placeholder="e.g. 2.5" autocomplete="off"></label>
         <label>Relationship Manager<select id="nc-rm">${rmOptions}</select></label>
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Add client</button>
@@ -2830,7 +2596,7 @@ function openAddDealModal(){
     <div class="modal-body">
       <form id="new-deal-form" class="form-grid">
         <label>Client<select id="nd-client">${clientOptions}</select></label>
-        <label>Deal size (₹ Cr)<input type="number" id="nd-amt" min="0" step="0.1" required placeholder="e.g. 1.2"></label>
+        <label>Deal size (₹ Cr)<input type="number" id="nd-amt" name="nd-amt" min="0" step="0.1" inputmode="decimal" required placeholder="e.g. 1.2" autocomplete="off"></label>
         <label>Stage
           <select id="nd-stage">
             <option value="discovery">Discovery</option>
@@ -2944,29 +2710,13 @@ function wireEvents(){
     renderClientsView();
   });
 
-  // Select-all (current page) checkbox — bound to both the desktop <thead>
-  // checkbox and the always-visible toolbar toggle used on mobile.
-  ['clients-select-all','clients-select-all-toggle'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.addEventListener('change', e=>{
-      const idsOnPage = Array.from(document.querySelectorAll('#clients-body input.row-select')).map(cb=>cb.getAttribute('data-id'));
-      if(e.target.checked) idsOnPage.forEach(pid=>clientsState.selected.add(pid));
-      else idsOnPage.forEach(pid=>clientsState.selected.delete(pid));
-      renderClientsView();
-    });
+  // Select-all (current page) checkbox
+  document.getElementById('clients-select-all').addEventListener('change', e=>{
+    const idsOnPage = Array.from(document.querySelectorAll('#clients-body input.row-select')).map(cb=>cb.getAttribute('data-id'));
+    if(e.target.checked) idsOnPage.forEach(id=>clientsState.selected.add(id));
+    else idsOnPage.forEach(id=>clientsState.selected.delete(id));
+    renderClientsView();
   });
-
-  // Rows-per-page selector
-  const perPageSelect = document.getElementById('clients-per-page');
-  if(perPageSelect){
-    perPageSelect.value = String(clientsState.perPage);
-    perPageSelect.addEventListener('change', e=>{
-      clientsState.perPage = parseInt(e.target.value, 10) || 10;
-      clientsState.page = 1;
-      renderClientsView();
-    });
-  }
 
   // Bulk actions bar
   document.getElementById('clients-clear-selection-btn').addEventListener('click', ()=>{
@@ -2976,9 +2726,9 @@ function wireEvents(){
   document.getElementById('clients-bulk-delete-btn').addEventListener('click', ()=>{
     const ids = Array.from(clientsState.selected);
     if(!ids.length) return;
-    showConfirm(`Delete ${ids.length} selected client${ids.length>1?'s':''}? This cannot be undone.`, ()=>{
+    if(confirm(`Delete ${ids.length} selected client${ids.length>1?'s':''}? This cannot be undone.`)){
       deleteClients(ids);
-    });
+    }
   });
 
   // Amount unit selector — reformats every money figure across the app
@@ -3103,7 +2853,7 @@ function wireEvents(){
     if(action==='goto-settings'){ gotoView('settings'); }
     if(action==='unlock-license'){ showLockScreen(); }
     if(action==='reset-demo'){
-      showConfirm('Reset all demo data back to the original seed? This cannot be undone.', ()=>{
+      if(confirm('Reset all demo data back to the original seed? This cannot be undone.')){
         (async ()=>{
           await clearDB();
           await loadDB();
@@ -3111,7 +2861,7 @@ function wireEvents(){
           animateAUM();
           toast('Demo data reset');
         })();
-      });
+      }
     }
     if(action==='sign-out'){
       toast('Signed out (demo only — no auth backend connected)');
@@ -3137,14 +2887,8 @@ function wireEvents(){
   document.getElementById('modal-overlay').addEventListener('click', e=>{
     if(e.target.id==='modal-overlay') closeModal();
   });
-  document.getElementById('confirm-overlay').addEventListener('click', e=>{
-    if(e.target.id==='confirm-overlay') e.currentTarget.classList.remove('open');
-  });
   document.addEventListener('keydown', e=>{
-    if(e.key==='Escape'){
-      closeModal();
-      document.getElementById('confirm-overlay').classList.remove('open');
-    }
+    if(e.key==='Escape') closeModal();
   });
 }
 
